@@ -1,46 +1,2177 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SPMB</title>
-  <link rel="icon" href="https://mentariilmu.org/logo.png" />
-  <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #eee;
-      overflow: hidden;
-      /* Mencegah scroll ganda */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Buku Tamu Digital - SMPIT Mentari Ilmu Karawang</title>
 
-    .iframe-container {
-      width: 100%;
-      height: 100dvh;
-      /* Menggunakan dvh agar pas di mobile browser */
-      overflow: hidden;
-    }
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    iframe {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- SheetJS (Excel Export) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+    <!-- jsPDF & AutoTable (PDF Export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Tailwind CSS (CDN Configuration) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: '#1D3B31', // Deep green from reference
+                        primaryLight: '#2A5245',
+                        primaryDark: '#12261F',
+                        accent: '#EAB308',
+                        surface: '#F8FAFC',
+                        pastelBlue: '#EFF6FF',
+                        pastelGreen: '#F0FDF4',
+                        pastelOrange: '#FFF7ED',
+                        pastelPurple: '#FAF5FF'
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 10px 25px -5px rgba(0, 0, 0, 0.03)',
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #F4F7F6;
+            font-family: 'Inter', sans-serif;
+            margin: 0; padding: 0; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .hidden-section { display: none !important; }
+        .view-container { transition: opacity 0.4s ease-in-out; }
+
+        /* Modern Input Styling */
+        .modern-input {
+            width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #E2E8F0; 
+            border-radius: 0.75rem; background-color: #F8FAFC; outline: none; 
+            transition: all 0.2s ease;
+        }
+        .modern-input:focus {
+            border-color: #2A5245; background-color: #FFFFFF; box-shadow: 0 0 0 4px rgba(42, 82, 69, 0.1);
+        }
+
+        /* Card Selection styling */
+        .type-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: 2px solid #E2E8F0;
+            background: white; position: relative; overflow: hidden;
+        }
+        .type-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05); border-color: #cbd5e1; }
+        .type-card.selected { border-color: #2A5245; background-color: #F0FDF4; }
+        .type-card.selected .icon-box { background-color: #2A5245; color: white; }
+        .type-card.selected h4 { color: #1D3B31; }
+        .type-card .check-icon { position: absolute; top: 1rem; right: 1rem; opacity: 0; transform: scale(0.5); transition: all 0.3s; color: #2A5245;}
+        .type-card.selected .check-icon { opacity: 1; transform: scale(1); }
+
+        /* Modal Overlay */
+        .modal-overlay { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%;
+            width: 20px; height: 20px; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Sidebar transitions */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-collapsed { width: 5rem !important; }
+        .sidebar-collapsed .menu-text, .sidebar-collapsed .menu-group-title { display: none; }
+        .sidebar-collapsed .admin-menu-btn { justify-content: center; padding-left: 0; padding-right: 0; }
+        .sidebar-collapsed .admin-menu-btn i { margin-right: 0 !important; font-size: 1.25rem; }
+        
+        /* Tooltips for collapsed sidebar */
+        .admin-menu-btn { position: relative; }
+        .sidebar-collapsed .admin-menu-btn::after {
+            content: attr(data-tooltip); position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+            margin-left: 10px; background: #1D3B31; color: white; padding: 4px 10px; border-radius: 6px;
+            font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+            z-index: 50;
+        }
+        .sidebar-collapsed .admin-menu-btn:hover::after { opacity: 1; }
+
+        @media (max-width: 768px) { 
+            .sidebar-mobile-hidden { transform: translateX(-100%); } 
+            #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 16rem !important; }
+            .sidebar-collapsed .menu-text { display: block; } /* Disable collapse logic on mobile */
+            .sidebar-collapsed .admin-menu-btn { justify-content: flex-start; padding-left: 1rem; padding-right: 1rem; }
+            .sidebar-collapsed .admin-menu-btn i { margin-right: 0.75rem !important; }
+            #admin-main-content { padding-bottom: 5rem; } /* Space for bottom nav */
+        }
+
+        /* Safe area for mobile bottom nav */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        }
+
+        /* Chart container */
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        /* Animation */
+        .animate-fade-up { animation: fadeUp 0.5s ease-out forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
+<body class="text-gray-800 antialiased h-screen flex flex-col selection:bg-primaryLight selection:text-white">
 
-<body>
-  <div class="iframe-container">
-    <iframe id="app" src="https://forms.gle/QkhL4SfovVjRC1cC6" scrolling="yes" allowfullscreen="true"
-      webkitallowfullscreen="true" mozallowfullscreen="true"
-      allow="fullscreen; camera; microphone; display-capture; geolocation;">
-    </iframe>
-  </div>
+    <!-- ========================================== -->
+    <!-- PUBLIC VIEW: GUEST BOOK FORM -->
+    <!-- ========================================== -->
+    <div id="public-view" class="view-container flex-grow flex flex-col h-full overflow-y-auto bg-[#F4F7F6]">
+        
+        <!-- Minimalist Header -->
+        <header class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
+            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <img src="https://mentariilmu.org/logo.png" alt="Logo SMPIT Mentari Ilmu" class="w-10 h-10 object-contain drop-shadow-sm">
+                    <div>
+                        <h1 class="font-bold text-gray-800 leading-tight">SMPIT Mentari Ilmu</h1>
+                        <p class="text-xs text-gray-500 font-medium tracking-wide">Buku Tamu Digital • <span id="headerTahunBukuTamu"></span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="publicClock" class="hidden md:block text-sm font-medium text-gray-500"></div>
+                    <button onclick="openModal('loginModal')" class="w-10 h-10 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 flex items-center justify-center transition-colors" title="Login Manajemen">
+                        <i class="fa-solid fa-lock text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex flex-col items-center justify-start p-4 md:py-10">
+            
+            <!-- Welcome Section -->
+            <div class="w-full max-w-3xl text-center mb-8 animate-fade-up">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-primary mb-3 tracking-tight">Selamat Datang 👋</h2>
+                <p class="text-gray-500 text-sm md:text-base max-w-lg mx-auto">Silakan catat kunjungan Anda melalui Buku Tamu Digital ini untuk memudahkan kami menyambut kedatangan Anda.</p>
+            </div>
+
+            <!-- Main Card -->
+            <div class="bg-white rounded-[2rem] shadow-card w-full max-w-3xl overflow-hidden border border-gray-50 p-6 md:p-10 animate-fade-up" style="animation-delay: 0.1s;">
+                <form id="guestForm" onsubmit="submitBukuTamu(event)">
+                    
+                    <!-- Section 1: Basic Info -->
+                    <div class="mb-10">
+                        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                            <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-600 flex items-center justify-center"><i class="fa-solid fa-address-card"></i></div>
+                            <h3 class="text-lg font-bold text-gray-800">Data Pengunjung</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                                <input type="text" id="guestName" required placeholder="Masukkan nama lengkap" class="modern-input">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nomor WhatsApp <span class="text-red-500">*</span></label>
+                                <input type="tel" id="guestWA" required placeholder="08xxxxxxxxxx" pattern="^[0-9\-\+]{9,15}$" class="modern-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Type Selection -->
+                    <div class="mb-10">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Tujuan Kunjungan <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Card Umum -->
+                            <div onclick="selectGuestType('Umum')" id="cardUmum" class="type-card rounded-2xl p-5 flex items-start gap-4">
+                                <i class="fa-solid fa-circle-check check-icon text-xl"></i>
+                                <div class="icon-box w-12 h-12 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-xl shrink-0 transition-colors"><i class="fa-solid fa-building-user"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-gray-700 text-lg mb-1">Tamu Umum</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed">Kunjungan umum dan keperluan administrasi sekolah.</p>
+                                </div>
+                            </div>
+                            <!-- Card SPMB -->
+                            <div onclick="selectGuestType('SPMB')" id="cardSPMB" class="type-card rounded-2xl p-5 flex items-start gap-4">
+                                <i class="fa-solid fa-circle-check check-icon text-xl"></i>
+                                <div class="icon-box w-12 h-12 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-xl shrink-0 transition-colors"><i class="fa-solid fa-user-graduate"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-gray-700 text-lg mb-1">Tamu SPMB</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed">Informasi penerimaan peserta didik baru (PPDB/SPMB).</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="guestType" required>
+                    </div>
+
+                    <!-- Section 3A: Tamu Umum Fields -->
+                    <div id="formUmum" class="hidden-section mb-10 animate-fade-up bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-8 h-8 rounded-lg bg-pastelOrange text-orange-600 flex items-center justify-center"><i class="fa-solid fa-briefcase"></i></div>
+                            <h3 class="text-md font-bold text-gray-800">Detail Kunjungan</h3>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Asal Instansi / Pribadi <span class="text-red-500">*</span></label>
+                                <input type="text" id="guestInstansi" placeholder="Contoh: Dinas Pendidikan / Pribadi" class="modern-input bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Keperluan Kunjungan <span class="text-red-500">*</span></label>
+                                <textarea id="guestKeperluan" rows="3" placeholder="Jelaskan keperluan kunjungan Anda secara singkat..." class="modern-input bg-white resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3B: Tamu SPMB Fields -->
+                    <div id="formSPMB" class="hidden-section mb-10 animate-fade-up bg-pastelGreen/50 p-6 rounded-2xl border border-green-100">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-8 h-8 rounded-lg bg-green-100 text-green-700 flex items-center justify-center"><i class="fa-solid fa-child-reaching"></i></div>
+                            <h3 class="text-md font-bold text-gray-800">Data Calon Siswa</h3>
+                        </div>
+                        <div class="space-y-5">
+                            <div class="md:w-1/2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Tahun Pelajaran Diminati <span class="text-red-500">*</span></label>
+                                <select id="spmbTahun" class="modern-input bg-white font-bold text-primary cursor-pointer">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap Calon Siswa <span class="text-red-500">*</span></label>
+                                <input type="text" id="spmbNamaSiswa" placeholder="Nama sesuai akta kelahiran" class="modern-input bg-white">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Tempat Lahir <span class="text-red-500">*</span></label>
+                                    <input type="text" id="spmbTempatLahir" placeholder="Kota/Kabupaten" class="modern-input bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Tanggal Lahir <span class="text-red-500">*</span></label>
+                                    <input type="date" id="spmbTanggalLahir" class="modern-input bg-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Asal Sekolah (TK/SD/MI) <span class="text-red-500">*</span></label>
+                                <input type="text" id="spmbAsalSekolah" placeholder="Nama sekolah asal" class="modern-input bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Alamat Lengkap Domisili <span class="text-red-500">*</span></label>
+                                <textarea id="spmbAlamat" rows="2" placeholder="Nama jalan, RT/RW, desa, kecamatan..." class="modern-input bg-white resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="btnSubmitForm" class="w-full bg-primary hover:bg-primaryLight text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3 text-lg">
+                        <span>Simpan Kunjungan</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="mt-12 text-center text-sm text-gray-400">
+                &copy; 2026 SMPIT Mentari Ilmu Karawang <br> 
+                <span class="text-xs">Digital Guest Book System</span>
+            </footer>
+        </main>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- ADMIN VIEW: EXECUTIVE DASHBOARD            -->
+    <!-- ========================================== -->
+    <div id="admin-view" class="view-container hidden-section h-full flex flex-col md:flex-row bg-[#F4F7F6]">
+        
+        <!-- Mobile Header & Overlay -->
+        <div class="md:hidden bg-primary text-white p-4 flex justify-between items-center shadow-md z-30 sticky top-0">
+            <div class="flex items-center gap-3">
+                <img src="https://mentariilmu.org/logo.png" alt="Logo" class="w-8 h-8 object-contain bg-white rounded-md p-0.5">
+                <h1 class="font-bold text-sm">Buku Tamu Mentari Ilmu</h1>
+            </div>
+            <button onclick="toggleSidebar()" class="text-2xl p-1"><i class="fa-solid fa-bars"></i></button>
+        </div>
+        <div id="mobileSidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar-transition sidebar-mobile-hidden fixed md:relative z-30 w-64 h-full bg-white shadow-card flex flex-col border-r border-gray-100 overflow-y-auto">
+            <!-- Sidebar Header -->
+            <div class="p-5 border-b border-gray-50 flex items-center justify-between sticky top-0 bg-white z-10">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <img src="https://mentariilmu.org/logo.png" alt="Logo" class="w-10 h-10 object-contain shrink-0 drop-shadow-sm">
+                    <div class="menu-text whitespace-nowrap">
+                        <h2 class="font-extrabold text-gray-800 text-sm leading-tight tracking-wide">Mentari Ilmu</h2>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold">Guest Book</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="flex-grow p-3 space-y-1">
+                <p class="menu-group-title px-3 pt-4 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Utama</p>
+                <button onclick="switchAdminMenu('dashboard')" id="menu-dashboard" data-tooltip="Dashboard" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all bg-pastelGreen text-primary font-bold">
+                    <i class="fa-solid fa-chart-pie w-6 text-center text-lg"></i> <span class="menu-text text-sm">Dashboard</span>
+                </button>
+                <button onclick="switchAdminMenu('rekap')" id="menu-rekap" data-tooltip="Rekap Buku Tamu" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                    <i class="fa-solid fa-book-bookmark w-6 text-center text-lg"></i> <span class="menu-text text-sm">Rekap Kunjungan</span>
+                </button>
+                <button onclick="switchAdminMenu('dataSPMB')" id="menu-dataSPMB" data-tooltip="Data Calon Siswa (SPMB)" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                    <i class="fa-solid fa-users-viewfinder w-6 text-center text-lg"></i> <span class="menu-text text-sm">Data SPMB</span>
+                </button>
+
+                <p class="menu-group-title px-3 pt-5 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Master Data</p>
+                <button onclick="switchAdminMenu('settingsSPMB')" id="menu-settingsSPMB" data-tooltip="Master SPMB" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                    <i class="fa-solid fa-graduation-cap w-6 text-center text-lg"></i> <span class="menu-text text-sm">Master SPMB</span>
+                </button>
+                <button onclick="switchAdminMenu('masterAkun')" id="menu-masterAkun" data-tooltip="Master Akun" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                    <i class="fa-solid fa-users-gear w-6 text-center text-lg"></i> <span class="menu-text text-sm">Master Akun</span>
+                </button>
+
+                <p class="menu-group-title px-3 pt-5 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pengaturan</p>
+                <button onclick="switchAdminMenu('settingsSystem')" id="menu-settingsSystem" data-tooltip="Konfigurasi" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                    <i class="fa-solid fa-sliders w-6 text-center text-lg"></i> <span class="menu-text text-sm">Sistem Global</span>
+                </button>
+                <button onclick="switchAdminMenu('profile')" id="menu-profile" data-tooltip="Profil Saya" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                    <i class="fa-regular fa-id-badge w-6 text-center text-lg"></i> <span class="menu-text text-sm">Profil Saya</span>
+                </button>
+            </nav>
+
+            <!-- Bottom Actions -->
+            <div class="p-3 border-t border-gray-50 space-y-1">
+                <button onclick="resetDemoData()" id="btnResetDemo" data-tooltip="Reset Data" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-orange-500 hover:bg-orange-50 transition-all font-medium">
+                    <i class="fa-solid fa-rotate-left w-6 text-center text-lg"></i> <span class="menu-text text-sm">Reset Data Demo</span>
+                </button>
+                <button onclick="logoutAdmin()" data-tooltip="Logout" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium">
+                    <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center text-lg"></i> <span class="menu-text text-sm">Keluar Aplikasi</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main id="admin-main-content" class="flex-grow overflow-y-auto flex flex-col relative w-full overflow-x-hidden">
+            
+            <!-- Dashboard Top Header (Desktop) -->
+            <header class="hidden md:flex justify-between items-center p-6 bg-[#F4F7F6] sticky top-0 z-20 backdrop-blur-sm bg-opacity-90">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebarDesktop()" class="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:text-primary transition-colors flex items-center justify-center">
+                        <i id="sidebarToggleIcon" class="fa-solid fa-chevron-left text-sm"></i>
+                    </button>
+                    <div>
+                        <h2 class="font-bold text-gray-800 text-lg">Buku Tamu Mentari Ilmu</h2>
+                        <p class="text-xs text-gray-500 font-medium">Tahun Pelajaran <span id="headerAdminTahunBukuTamu"></span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-5">
+                    <div class="text-right border-r border-gray-200 pr-5">
+                        <p id="liveClockAdmin" class="font-bold text-gray-800 text-sm"></p>
+                        <p id="liveDateAdmin" class="text-xs text-gray-500"></p>
+                    </div>
+                    <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" onclick="switchAdminMenu('profile')">
+                        <div class="text-right">
+                            <p id="adminHeaderName" class="font-bold text-gray-800 text-sm leading-tight">Admin</p>
+                            <p id="adminHeaderRole" class="text-xs text-primary font-medium">Role</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-primaryLight text-white flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-4 md:p-6 pb-24 md:pb-6 flex-grow">
+                
+                <!-- SECTION: DASHBOARD -->
+                <div id="content-dashboard" class="admin-content animate-fade-up">
+                    
+                    <!-- Hero Banner -->
+                    <div class="bg-primary rounded-3xl p-6 md:p-8 text-white relative overflow-hidden shadow-card mb-6">
+                        <!-- Decorative shapes -->
+                        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 rounded-full bg-white opacity-5"></div>
+                        <div class="absolute bottom-0 right-20 -mb-10 w-32 h-32 rounded-full bg-white opacity-10"></div>
+                        
+                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block backdrop-blur-sm border border-white/20">
+                                    <i class="fa-regular fa-calendar-check mr-1"></i> Periode Aktif: <span id="dashPeriodeAktif"></span>
+                                </span>
+                                <h2 class="text-2xl md:text-3xl font-extrabold mb-1">Selamat pagi, <span id="dashHeroName">Admin</span> 👋</h2>
+                                <p class="text-primaryLight text-sm md:text-base font-medium text-white/80">Pantau aktivitas Buku Tamu Digital SMPIT Mentari Ilmu dengan lebih mudah hari ini.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Access -->
+                    <div class="mb-6">
+                        <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3 px-1">Akses Cepat</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                            <div onclick="switchAdminMenu('rekap')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
+                                <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-table-list"></i></div>
+                                <p class="font-bold text-gray-700 text-sm">Rekap Umum</p>
+                            </div>
+                            <div onclick="switchAdminMenu('dataSPMB')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-orange-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
+                                <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-users-viewfinder"></i></div>
+                                <p class="font-bold text-gray-700 text-sm">Data SPMB</p>
+                            </div>
+                            <div onclick="switchAdminMenu('settingsSPMB')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
+                                <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-sliders"></i></div>
+                                <p class="font-bold text-gray-700 text-sm">Master SPMB</p>
+                            </div>
+                            <div onclick="switchAdminMenu('masterAkun')" id="qa-masterAkun" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
+                                <div class="w-10 h-10 rounded-xl bg-pastelPurple text-purple-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-users-gear"></i></div>
+                                <p class="font-bold text-gray-700 text-sm">Master Akun</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Stats Grid -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider px-1">Ringkasan Statistik</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-pastelBlue/50 rounded-2xl p-5 border border-blue-100">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wider">Total Tamu</p>
+                                        <i class="fa-solid fa-users text-blue-300"></i>
+                                    </div>
+                                    <h3 class="text-4xl font-extrabold text-blue-900" id="statTotal">0</h3>
+                                </div>
+                                <div class="bg-pastelGreen/50 rounded-2xl p-5 border border-green-100">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <p class="text-xs font-bold text-green-600 uppercase tracking-wider">Hari Ini</p>
+                                        <i class="fa-solid fa-calendar-day text-green-300"></i>
+                                    </div>
+                                    <h3 class="text-4xl font-extrabold text-green-900" id="statToday">0</h3>
+                                </div>
+                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tamu Umum</p>
+                                    <div class="flex items-end justify-between">
+                                        <h3 class="text-3xl font-extrabold text-gray-700" id="statUmum">0</h3>
+                                        <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center"><i class="fa-solid fa-building-user text-sm"></i></div>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tamu SPMB</p>
+                                    <div class="flex items-end justify-between">
+                                        <h3 class="text-3xl font-extrabold text-gray-700" id="statSPMB">0</h3>
+                                        <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-400 flex items-center justify-center"><i class="fa-solid fa-user-graduate text-sm"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart -->
+                            <div class="bg-white p-6 rounded-2xl shadow-card border border-gray-100 w-full">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line text-primary text-opacity-50"></i> Grafik Kunjungan (7 Hari)</h3>
+                                <div class="chart-container">
+                                    <canvas id="visitorChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Side Info -->
+                        <div class="space-y-6">
+                            <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider px-1">Informasi SPMB</h3>
+                            <div class="bg-white rounded-2xl shadow-card border border-gray-100 p-1">
+                                <ul id="dashboardSpmbInfoList" class="divide-y divide-gray-50">
+                                    <!-- Populated dynamically -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: DATA SPMB (NEW) -->
+                <div id="content-dataSPMB" class="admin-content hidden-section animate-fade-up">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-gray-800">Data Calon Siswa (SPMB)</h2>
+                            <p class="text-sm text-gray-500">Kelola dan pantau pendaftar spesifik SPMB.</p>
+                        </div>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <button onclick="exportExcelSPMB()" class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-excel"></i> Excel
+                            </button>
+                            <button onclick="exportPDFSPMB()" class="flex-1 md:flex-none bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-pdf"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards SPMB -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Calon Siswa</p>
+                                <h4 class="text-2xl font-extrabold text-gray-800 mt-1" id="spmbStatTotal">0</h4>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-pastelOrange text-orange-600 flex items-center justify-center text-xl"><i class="fa-solid fa-users"></i></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Kunjungan Hari Ini</p>
+                                <h4 class="text-2xl font-extrabold text-gray-800 mt-1" id="spmbStatToday">0</h4>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-pastelGreen text-green-600 flex items-center justify-center text-xl"><i class="fa-solid fa-calendar-check"></i></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sekolah Asal</p>
+                                <h4 class="text-2xl font-extrabold text-gray-800 mt-1" id="spmbStatSekolah">0</h4>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-pastelBlue text-blue-600 flex items-center justify-center text-xl"><i class="fa-solid fa-school"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Filters Card SPMB -->
+                    <div class="bg-white p-5 rounded-2xl shadow-card border border-gray-100 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div class="md:col-span-1">
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Nama Calon Siswa</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400"></i>
+                                    <input type="text" id="filterSpmbNama" placeholder="Cari nama..." oninput="filterDataSPMB()" class="modern-input !py-2 !pl-10 !text-sm">
+                                </div>
+                            </div>
+                            <div class="md:col-span-1">
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Asal Sekolah</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-school absolute left-3.5 top-3 text-gray-400 text-xs"></i>
+                                    <input type="text" id="filterSpmbSekolah" placeholder="Cari sekolah..." oninput="filterDataSPMB()" class="modern-input !py-2 !pl-10 !text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Tahun Diminati</label>
+                                <select id="filterSpmbTahunTarget" onchange="filterDataSPMB()" class="modern-input !py-2 !text-sm cursor-pointer">
+                                    <option value="Semua">Semua Tahun</option>
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Periode Buku Tamu</label>
+                                <select id="filterSpmbTahunBuku" onchange="filterDataSPMB()" class="modern-input !py-2 !text-sm cursor-pointer">
+                                    <option value="Semua">Semua Periode</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Waktu</label>
+                                <div class="flex gap-2">
+                                    <select id="filterSpmbWaktu" onchange="filterDataSPMB()" class="modern-input !py-2 !text-sm cursor-pointer flex-grow">
+                                        <option value="Semua">Semua Waktu</option>
+                                        <option value="Hari Ini">Hari Ini</option>
+                                        <option value="7 Hari">7 Hari Terakhir</option>
+                                        <option value="Bulan Ini">Bulan Ini</option>
+                                    </select>
+                                    <button onclick="resetFiltersSPMB()" class="w-10 h-10 shrink-0 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 flex items-center justify-center transition-colors" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Card SPMB -->
+                    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse whitespace-nowrap">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-100">
+                                        <th class="p-4 font-bold w-12 text-center">No</th>
+                                        <th class="p-4 font-bold">Waktu</th>
+                                        <th class="p-4 font-bold">Calon Siswa</th>
+                                        <th class="p-4 font-bold">Tahun Diminati</th>
+                                        <th class="p-4 font-bold">Asal Sekolah</th>
+                                        <th class="p-4 font-bold">Kontak Info</th>
+                                        <th class="p-4 font-bold text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodyDataSPMB" class="text-sm divide-y divide-gray-50">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="tableEmptyStateSPMB" class="hidden-section p-16 text-center text-gray-400">
+                            <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"><i class="fa-regular fa-folder-open"></i></div>
+                            <p class="font-medium">Tidak ada data SPMB yang sesuai dengan filter.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: REKAP BUKU TAMU (UMUM & SPMB) -->
+                <div id="content-rekap" class="admin-content hidden-section animate-fade-up">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-gray-800">Rekap Kunjungan Global</h2>
+                            <p class="text-sm text-gray-500">Kelola dan unduh semua riwayat data buku tamu.</p>
+                        </div>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <button onclick="exportExcel()" class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-excel"></i> Excel
+                            </button>
+                            <button onclick="exportPDF()" class="flex-1 md:flex-none bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-pdf"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filters Card -->
+                    <div class="bg-white p-5 rounded-2xl shadow-card border border-gray-100 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="md:col-span-1">
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Pencarian</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400"></i>
+                                    <input type="text" id="filterSearch" placeholder="Cari nama, WA..." oninput="filterData()" class="modern-input !py-2 !pl-10 !text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Periode Buku Tamu</label>
+                                <select id="filterTahunBuku" onchange="filterData()" class="modern-input !py-2 !text-sm cursor-pointer">
+                                    <option value="Semua">Semua Periode</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Jenis Tamu</label>
+                                <select id="filterJenisSPMB" onchange="filterData()" class="modern-input !py-2 !text-sm cursor-pointer">
+                                    <option value="Semua">Semua Jenis</option>
+                                    <option value="Umum">Tamu Umum</option>
+                                    <optgroup label="Tamu SPMB" id="optgroupSPMB"></optgroup>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Waktu</label>
+                                <div class="flex gap-2">
+                                    <select id="filterWaktu" onchange="filterData()" class="modern-input !py-2 !text-sm cursor-pointer flex-grow">
+                                        <option value="Semua">Semua Waktu</option>
+                                        <option value="Hari Ini">Hari Ini</option>
+                                        <option value="7 Hari">7 Hari Terakhir</option>
+                                        <option value="Bulan Ini">Bulan Ini</option>
+                                    </select>
+                                    <button onclick="resetFilters()" class="w-10 h-10 shrink-0 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 flex items-center justify-center transition-colors" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Card -->
+                    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse whitespace-nowrap">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-100">
+                                        <th class="p-4 font-bold w-12 text-center">No</th>
+                                        <th class="p-4 font-bold">Tanggal & Waktu</th>
+                                        <th class="p-4 font-bold">Pengunjung</th>
+                                        <th class="p-4 font-bold">Jenis / Info</th>
+                                        <th class="p-4 font-bold">Periode</th>
+                                        <th class="p-4 font-bold text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodyRekap" class="text-sm divide-y divide-gray-50">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="tableEmptyState" class="hidden-section p-16 text-center text-gray-400">
+                            <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"><i class="fa-regular fa-folder-open"></i></div>
+                            <p class="font-medium">Tidak ada data yang sesuai dengan filter.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: MASTER SPMB -->
+                <div id="content-settingsSPMB" class="admin-content hidden-section animate-fade-up">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-gray-800">Master SPMB</h2>
+                            <p class="text-sm text-gray-500">Kelola opsi Tahun Pelajaran dan Grup WA SPMB.</p>
+                        </div>
+                        <button onclick="openSPMBModal()" class="w-full md:w-auto bg-primary hover:bg-primaryLight text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center justify-center gap-2 transition-colors">
+                            <i class="fa-solid fa-plus"></i> Tambah Tahun Pelajaran
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-100">
+                                        <th class="p-4 font-bold w-12 text-center">No</th>
+                                        <th class="p-4 font-bold">Tahun Pelajaran</th>
+                                        <th class="p-4 font-bold">Grup WhatsApp</th>
+                                        <th class="p-4 font-bold">Admin/Status</th>
+                                        <th class="p-4 font-bold text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodySPMB" class="text-sm divide-y divide-gray-50">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: MASTER AKUN -->
+                <div id="content-masterAkun" class="admin-content hidden-section animate-fade-up">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-gray-800">Master Akun Pengguna</h2>
+                            <p class="text-sm text-gray-500">Kelola akses login Administrator dan Manajemen.</p>
+                        </div>
+                        <button onclick="openAkunModal()" class="w-full md:w-auto bg-primary hover:bg-primaryLight text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm flex items-center justify-center gap-2 transition-colors">
+                            <i class="fa-solid fa-user-plus"></i> Tambah Akun
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-widest border-b border-gray-100">
+                                        <th class="p-4 font-bold w-12 text-center">No</th>
+                                        <th class="p-4 font-bold">Nama Lengkap</th>
+                                        <th class="p-4 font-bold">Username / Role</th>
+                                        <th class="p-4 font-bold">Status</th>
+                                        <th class="p-4 font-bold text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBodyAkun" class="text-sm divide-y divide-gray-50">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: KONFIGURASI SISTEM -->
+                <div id="content-settingsSystem" class="admin-content hidden-section animate-fade-up">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-extrabold text-gray-800">Konfigurasi Sistem Global</h2>
+                        <p class="text-sm text-gray-500">Pengaturan dasar operasional aplikasi Buku Tamu.</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-card border border-gray-100 p-6 md:p-8 max-w-2xl">
+                        <form onsubmit="updateActiveAcademicYear(event)">
+                            <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
+                                <div class="w-12 h-12 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 text-2xl"><i class="fa-solid fa-calendar-check"></i></div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">Periode Aktif Buku Tamu</h3>
+                                    <p class="text-xs text-gray-500">Tahun ini akan otomatis disematkan pada setiap data tamu baru.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Tahun Pelajaran</label>
+                                <div class="flex gap-3">
+                                    <select id="sysConfigTahunAktif" class="modern-input font-bold text-primary cursor-pointer w-2/3">
+                                        <option value="2026/2027">2026/2027</option>
+                                        <option value="2027/2028">2027/2028</option>
+                                        <option value="2028/2029">2028/2029</option>
+                                    </select>
+                                    <button type="submit" class="w-1/3 bg-primary hover:bg-primaryLight text-white rounded-xl font-bold transition-colors">
+                                        Simpan
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50/50 text-blue-800 p-4 rounded-xl text-sm border border-blue-100 flex items-start gap-3">
+                                <i class="fa-solid fa-circle-info mt-0.5 text-blue-500"></i>
+                                <div>
+                                    <p class="font-bold mb-1">Catatan Penting</p>
+                                    <p class="text-xs text-blue-700 leading-relaxed">Perubahan ini <b>tidak akan mengubah</b> data tamu yang sudah tersimpan sebelumnya. Ini hanya berlaku untuk pencatatan buku tamu baru mulai saat ini ke depan.</p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SECTION: PROFIL SAYA -->
+                <div id="content-profile" class="admin-content hidden-section animate-fade-up">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-extrabold text-gray-800">Profil Saya</h2>
+                        <p class="text-sm text-gray-500">Informasi akun Anda yang sedang aktif.</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-card border border-gray-100 p-6 max-w-2xl">
+                        <div class="flex items-center gap-6 mb-8 border-b border-gray-100 pb-8">
+                            <div class="w-24 h-24 bg-primary text-white rounded-2xl flex items-center justify-center text-4xl shadow-inner font-bold" id="profileInitials">
+                                AD
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-extrabold text-gray-800 mb-1" id="profileName">Nama Admin</h3>
+                                <span class="bg-pastelBlue text-blue-700 border border-blue-200 text-xs px-3 py-1 rounded-full font-bold inline-block" id="profileRole">Role</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Username Login</p>
+                                <p class="text-gray-800 font-mono bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg inline-block text-sm" id="profileUsername">username</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Status Akun</p>
+                                <p class="text-green-600 font-bold flex items-center gap-2"><i class="fa-solid fa-circle-check text-sm"></i> Aktif</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Navigation (Only visible < 768px) -->
+        <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] rounded-t-3xl z-40 flex justify-around items-center p-2 pb-safe border-t border-gray-100">
+            <button onclick="switchAdminMenu('dashboard')" id="mobnav-dashboard" class="flex flex-col items-center gap-1 p-2 flex-1 text-gray-400 hover:text-primary transition-colors">
+                <i class="fa-solid fa-house text-xl mb-1"></i>
+                <span class="text-[9px] font-bold">Home</span>
+            </button>
+            <button onclick="switchAdminMenu('rekap')" id="mobnav-rekap" class="flex flex-col items-center gap-1 p-2 flex-1 text-gray-400 hover:text-primary transition-colors">
+                <i class="fa-solid fa-book-bookmark text-xl mb-1"></i>
+                <span class="text-[9px] font-bold">Rekap</span>
+            </button>
+            <button onclick="switchAdminMenu('dataSPMB')" id="mobnav-dataSPMB" class="flex flex-col items-center gap-1 p-2 flex-1 text-gray-400 hover:text-primary transition-colors">
+                <i class="fa-solid fa-users-viewfinder text-xl mb-1"></i>
+                <span class="text-[9px] font-bold">SPMB</span>
+            </button>
+            <button onclick="switchAdminMenu('settingsSPMB')" id="mobnav-settingsSPMB" class="flex flex-col items-center gap-1 p-2 flex-1 text-gray-400 hover:text-primary transition-colors">
+                <i class="fa-solid fa-graduation-cap text-xl mb-1"></i>
+                <span class="text-[9px] font-bold">Master</span>
+            </button>
+            <button onclick="switchAdminMenu('masterAkun')" id="mobnav-masterAkun" class="flex flex-col items-center gap-1 p-2 flex-1 text-gray-400 hover:text-primary transition-colors">
+                <i class="fa-solid fa-users-gear text-xl mb-1"></i>
+                <span class="text-[9px] font-bold text-center leading-none">Akun</span>
+            </button>
+        </nav>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODALS -->
+    <!-- ========================================== -->
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-fade-up relative border border-gray-100">
+            <button onclick="closeModal('loginModal')" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"><i class="fa-solid fa-times"></i></button>
+            
+            <div class="p-8">
+                <div class="text-center mb-8">
+                    <img src="https://mentariilmu.org/logo.png" alt="Logo" class="w-16 h-16 object-contain mx-auto mb-4 drop-shadow-md">
+                    <h3 class="text-2xl font-extrabold text-gray-800">Login Sistem</h3>
+                    <p class="text-sm text-gray-500 mt-1">Gunakan akun admin/manajemen.</p>
+                </div>
+
+                <form id="loginForm" onsubmit="loginAdmin(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Username</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="text" id="loginUsername" required placeholder="Masukkan username" class="modern-input !pl-11">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Password</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-4 top-3.5 text-gray-400"></i>
+                            <input type="password" id="loginPassword" required placeholder="••••••••" class="modern-input !pl-11 !pr-11">
+                            <button type="button" id="toggleLoginPwdBtn" onclick="togglePasswordVisibility('loginPassword', 'toggleLoginPwdIcon')" class="absolute right-3 top-2.5 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <i id="toggleLoginPwdIcon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primaryLight text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg mt-4 flex items-center justify-center gap-2">
+                        Masuk Dashboard <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                </form>
+                
+                <div class="mt-6 pt-4 border-t border-gray-100 text-center">
+                    <p class="text-[10px] text-gray-400">Demo Akun Admin: <span class="font-mono text-gray-600 bg-gray-50 px-1 rounded border border-gray-200">admin</span> / <span class="font-mono text-gray-600 bg-gray-50 px-1 rounded border border-gray-200">admin123</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 text-center animate-fade-up border border-gray-100">
+            <div id="successIcon" class="text-6xl mb-5 drop-shadow-md">🎉</div>
+            <h3 id="successTitle" class="text-2xl font-extrabold text-gray-800 mb-3">TERIMA KASIH</h3>
+            <div id="successMessage" class="text-gray-500 text-sm md:text-base mb-8 space-y-2 leading-relaxed">
+                <!-- Dynamic content -->
+            </div>
+            <div id="successActionContainer" class="mb-4">
+                <!-- Dynamic button -->
+            </div>
+            <button onclick="closeSuccessModal()" class="w-full bg-gray-100 text-gray-700 font-bold py-3.5 px-4 rounded-xl hover:bg-gray-200 transition-colors">SELESAI</button>
+        </div>
+    </div>
+
+    <!-- Detail Guest Modal (Admin) - REDESIGNED -->
+    <div id="detailModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-xl overflow-hidden animate-fade-up flex flex-col max-h-[95vh] border border-gray-100">
+            <div class="flex justify-between items-center p-5 md:p-6 border-b border-gray-100 shrink-0 bg-white sticky top-0 z-10">
+                <h3 id="detailTitle" class="text-lg md:text-xl font-bold text-gray-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-600 flex items-center justify-center"><i class="fa-solid fa-address-card"></i></div>
+                    Detail Kunjungan
+                </h3>
+                <button onclick="closeModal('detailModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-times"></i></button>
+            </div>
+            
+            <div class="p-5 md:p-8 overflow-y-auto bg-gray-50/30" id="detailContentContainer">
+                <!-- Injected dynamically by JS -->
+            </div>
+            
+            <div class="bg-white p-5 border-t border-gray-100 text-right shrink-0">
+                <button onclick="closeModal('detailModal')" class="bg-white border border-gray-200 shadow-sm text-gray-700 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-colors">Tutup Detail</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form SPMB Setting Modal -->
+    <div id="spmbModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-fade-up border border-gray-100">
+            <div class="flex justify-between items-center p-6 border-b border-gray-50">
+                <h3 id="spmbModalTitle" class="text-lg font-bold text-gray-800">Tambah Tahun Pelajaran SPMB</h3>
+                <button onclick="closeModal('spmbModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-700 hover:bg-gray-200"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="spmbForm" onsubmit="saveMasterSPMB(event)" class="space-y-4">
+                    <input type="hidden" id="spmbId">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Tahun Pelajaran <span class="text-red-500">*</span></label>
+                        <input type="text" id="setSpmbTahun" required placeholder="Contoh: 2030/2031" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Link Grup WhatsApp</label>
+                        <input type="url" id="setSpmbLink" placeholder="https://chat.whatsapp.com/..." class="modern-input text-sm">
+                        <p class="text-[10px] text-gray-400 mt-1.5">Kosongkan jika belum tersedia.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Nomor WA Admin <span class="text-red-500">*</span></label>
+                        <input type="tel" id="setSpmbAdmin" required placeholder="628xxxxxxxxxx" pattern="^[0-9]+$" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Pesan Teks (SPMB) <span class="text-red-500">*</span></label>
+                        <textarea id="setSpmbPesan" required rows="2" placeholder="Pesan setelah mendaftar..." class="modern-input text-sm resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Status Tampil <span class="text-red-500">*</span></label>
+                        <select id="setSpmbStatus" class="modern-input cursor-pointer font-bold">
+                            <option value="Aktif">Aktif Tampil</option>
+                            <option value="Nonaktif">Sembunyikan</option>
+                        </select>
+                    </div>
+                    <div class="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
+                        <button type="button" onclick="closeModal('spmbModal')" class="border border-gray-200 bg-white text-gray-600 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-colors">Batal</button>
+                        <button type="submit" class="bg-primary hover:bg-primaryLight text-white px-6 py-2.5 rounded-xl font-bold transition-colors shadow-md">Simpan Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Master Akun Setting Modal -->
+    <div id="akunModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-fade-up border border-gray-100 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b border-gray-50 shrink-0">
+                <h3 id="akunModalTitle" class="text-lg font-bold text-gray-800">Tambah Akun Baru</h3>
+                <button onclick="closeModal('akunModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-700 hover:bg-gray-200"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <form id="akunForm" onsubmit="saveMasterAkun(event)" class="space-y-4">
+                    <input type="hidden" id="akunId">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" id="setAkunNama" required placeholder="Nama user" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Username <span class="text-red-500">*</span></label>
+                        <input type="text" id="setAkunUsername" required placeholder="Username unik (tanpa spasi)" pattern="^\S+$" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5" id="lblAkunPwd">Password <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <input type="password" id="setAkunPassword" required placeholder="Minimal 6 karakter" minlength="6" class="modern-input !pr-11">
+                            <button type="button" id="toggleSetPwdBtn" onclick="togglePasswordVisibility('setAkunPassword', 'toggleSetPwdIcon')" class="absolute right-3 top-2.5 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <i id="toggleSetPwdIcon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <p id="helpAkunPwd" class="text-[10px] text-gray-400 mt-1.5 hidden">Kosongkan jika tidak ingin mengubah password saat ini.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Hak Akses <span class="text-red-500">*</span></label>
+                            <select id="setAkunRole" class="modern-input cursor-pointer font-bold">
+                                <option value="Manajemen">Manajemen</option>
+                                <option value="Admin">Admin Utama</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Status <span class="text-red-500">*</span></label>
+                            <select id="setAkunStatus" class="modern-input cursor-pointer font-bold">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Nonaktif">Nonaktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pt-6 border-t border-gray-100 mt-6 flex justify-end gap-3">
+                        <button type="button" onclick="closeModal('akunModal')" class="border border-gray-200 bg-white text-gray-600 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-colors">Batal</button>
+                        <button type="submit" class="bg-primary hover:bg-primaryLight text-white px-6 py-2.5 rounded-xl font-bold transition-colors shadow-md">Simpan Akun</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC                           -->
+    <!-- ========================================== -->
+    <script>
+        // ==========================================
+        // 1. DATA CONSTANTS & DEFAULTS
+        // ==========================================
+        const LS_KEYS = {
+            BUKU_TAMU: 'smpit_buku_tamu_v3',
+            MASTER_SPMB: 'smpit_master_spmb_v3',
+            SYSTEM_CONFIG: 'smpit_sys_config_v3',
+            MASTER_AKUN: 'smpit_master_akun_v3',
+            ADMIN_SESSION: 'smpit_admin_session_v3'
+        };
+
+        const defaultSystemConfig = {
+            namaSekolah: "SMPIT Mentari Ilmu Karawang",
+            judul: "Buku Tamu",
+            tahunPelajaranBukuTamu: "2026/2027"
+        };
+
+        const defaultMasterSPMB = [
+            { id: "SPMB001", tahun: "2028/2029", linkWhatsApp: "https://chat.whatsapp.com/CONTOH-2028", nomorAdmin: "6281234567890", pesanSPMB: "Silakan bergabung dengan Grup WhatsApp SPMB.", status: "Aktif" },
+            { id: "SPMB002", tahun: "2029/2030", linkWhatsApp: "", nomorAdmin: "6281234567890", pesanSPMB: "Informasi grup belum tersedia.", status: "Aktif" }
+        ];
+
+        const defaultMasterAkun = [
+            { id: "USR001", nama: "Admin Manajemen", username: "admin", password: "admin123", role: "Admin", status: "Aktif" },
+            { id: "USR002", nama: "Manajemen Sekolah", username: "manajemen", password: "123456", role: "Manajemen", status: "Aktif" }
+        ];
+
+        let SYSTEM_CONFIG = {};
+        let masterSPMB = [];
+        let masterAkun = [];
+        let bukuTamu = [];
+        let filteredData = []; 
+        let filteredSpmbData = []; // Khusus menu SPMB
+        let chartInstance = null;
+        let activeAdmin = null;
+
+        // ==========================================
+        // 2. UTILITIES & UI HELPERS
+        // ==========================================
+        const getEl = id => document.getElementById(id);
+        const formatTgl = dStr => {
+            if(!dStr) return "-";
+            const d = new Date(dStr);
+            const pad = n => n.toString().padStart(2, '0');
+            return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        };
+        const generateId = prefix => prefix + Date.now().toString(36).toUpperCase();
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = getEl(inputId);
+            const icon = getEl(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        function startLiveClock() {
+            const updateClock = () => {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const dateStr = now.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                
+                if(getEl('publicClock')) getEl('publicClock').innerText = `${dateStr} · ${timeStr}`;
+                if(getEl('liveClockAdmin')) getEl('liveClockAdmin').innerText = timeStr + ' WIB';
+                if(getEl('liveDateAdmin')) getEl('liveDateAdmin').innerText = dateStr;
+            };
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function toggleSidebarDesktop() {
+            const sidebar = getEl('sidebar');
+            const icon = getEl('sidebarToggleIcon');
+            sidebar.classList.toggle('sidebar-collapsed');
+            if(sidebar.classList.contains('sidebar-collapsed')) {
+                icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+            } else {
+                icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+            }
+        }
+
+        // ==========================================
+        // 3. SYSTEM INIT & DATA LOADERS
+        // ==========================================
+        function initApp() {
+            loadSystemConfig();
+            loadMasterSPMB();
+            loadMasterAkun();
+            loadBukuTamuData();
+            
+            // Setup UI
+            getEl('headerTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
+            getEl('headerAdminTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
+            populatePublicSPMBDropdown();
+            startLiveClock();
+            
+            // Setup Admin Session Check
+            checkAdminSession();
+        }
+
+        function loadSystemConfig() {
+            const saved = localStorage.getItem(LS_KEYS.SYSTEM_CONFIG);
+            if(saved) SYSTEM_CONFIG = JSON.parse(saved);
+            else {
+                SYSTEM_CONFIG = {...defaultSystemConfig};
+                localStorage.setItem(LS_KEYS.SYSTEM_CONFIG, JSON.stringify(SYSTEM_CONFIG));
+            }
+            if(getEl('sysConfigTahunAktif')) getEl('sysConfigTahunAktif').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
+        }
+
+        function loadMasterSPMB() {
+            const saved = localStorage.getItem(LS_KEYS.MASTER_SPMB);
+            if(saved) masterSPMB = JSON.parse(saved);
+            else {
+                masterSPMB = [...defaultMasterSPMB];
+                localStorage.setItem(LS_KEYS.MASTER_SPMB, JSON.stringify(masterSPMB));
+            }
+        }
+
+        function loadMasterAkun() {
+            const saved = localStorage.getItem(LS_KEYS.MASTER_AKUN);
+            if(saved) masterAkun = JSON.parse(saved);
+            else {
+                masterAkun = [...defaultMasterAkun];
+                localStorage.setItem(LS_KEYS.MASTER_AKUN, JSON.stringify(masterAkun));
+            }
+        }
+
+        function loadBukuTamuData() {
+            const saved = localStorage.getItem(LS_KEYS.BUKU_TAMU);
+            if(saved) {
+                bukuTamu = JSON.parse(saved);
+            } else {
+                bukuTamu = generateDummyData();
+                localStorage.setItem(LS_KEYS.BUKU_TAMU, JSON.stringify(bukuTamu));
+            }
+        }
+
+        function generateDummyData() {
+            const dummy = [];
+            const names = ["Ahmad Fauzi", "Siti Aminah", "Budi Santoso", "Rina Marlina", "Andi Irawan", "Dewi Lestari", "Hendra Gunawan", "Maya Sari", "Fajar Sidiq", "Nita Kurnia", "Reza Pratama", "Dian Sastro", "Eko Yuli", "Fitriani", "Agus Setiawan", "Rizal Fahmi"];
+            const instansiList = ["SDIT Al Hikmah", "Pribadi", "SDN Karawang 1", "Dinas Pendidikan", "Pribadi", "PT XYZ", "TK ABA 1", "PAUD Mentari"];
+            
+            const now = new Date();
+            for(let i=0; i<30; i++) { // Increase dummy to ensure enough SPMB
+                const date = new Date(now.getTime() - Math.floor(Math.random() * 15) * 24 * 60 * 60 * 1000 - Math.random() * 8 * 60 * 60 * 1000);
+                const type = Math.random() > 0.4 ? "SPMB" : "Umum"; // Slightly favor SPMB for demo
+                
+                let entry = {
+                    id: `BT${i.toString().padStart(3,'0')}_${Date.now().toString().slice(-4)}`,
+                    timestamp: formatTgl(date.toISOString()), 
+                    _rawDate: date.toISOString(), 
+                    tahunPelajaranBukuTamu: "2026/2027",
+                    nama: names[i % names.length] || "Pengunjung " + i,
+                    whatsapp: `0812${Math.floor(Math.random() * 100000000)}`,
+                    jenisTamu: type,
+                    instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: ""
+                };
+
+                if(type === "Umum") {
+                    entry.instansi = instansiList[Math.floor(Math.random() * instansiList.length)];
+                    entry.keperluan = "Konsultasi administrasi dan keliling melihat sarana prasarana.";
+                } else {
+                    entry.namaCalonSiswa = `Calon ${entry.nama.split(' ')[0]}`;
+                    entry.tempatLahir = Math.random() > 0.5 ? "Karawang" : "Bekasi";
+                    entry.tanggalLahir = `201${Math.floor(Math.random()*4+4)}-0${Math.floor(Math.random()*8+1)}-1${Math.floor(Math.random()*8+1)}`;
+                    entry.asalSekolah = instansiList[Math.floor(Math.random() * (instansiList.length))];
+                    entry.alamat = "Perumahan Indah Blok " + String.fromCharCode(65+Math.floor(Math.random()*5)) + " No. " + (i+1);
+                    entry.tahunPelajaranSPMB = Math.random() > 0.5 ? "2028/2029" : "2029/2030";
+                }
+                dummy.push(entry);
+            }
+            return dummy.sort((a,b) => new Date(b._rawDate) - new Date(a._rawDate));
+        }
+
+        // ==========================================
+        // 4. PUBLIC BUKU TAMU LOGIC
+        // ==========================================
+        function selectGuestType(type) {
+            getEl('guestType').value = type;
+            getEl('cardUmum').classList.remove('selected');
+            getEl('cardSPMB').classList.remove('selected');
+            getEl('card' + type).classList.add('selected');
+
+            getEl('formUmum').classList.add('hidden-section');
+            getEl('formSPMB').classList.add('hidden-section');
+            
+            const reqUmum = ['guestInstansi', 'guestKeperluan'];
+            const reqSpmb = ['spmbTahun', 'spmbNamaSiswa', 'spmbTempatLahir', 'spmbTanggalLahir', 'spmbAsalSekolah', 'spmbAlamat'];
+            reqUmum.forEach(id => getEl(id).required = false);
+            reqSpmb.forEach(id => getEl(id).required = false);
+
+            if(type === 'Umum') {
+                getEl('formUmum').classList.remove('hidden-section');
+                reqUmum.forEach(id => getEl(id).required = true);
+            } else {
+                getEl('formSPMB').classList.remove('hidden-section');
+                reqSpmb.forEach(id => getEl(id).required = true);
+            }
+        }
+
+        function populatePublicSPMBDropdown() {
+            const select = getEl('spmbTahun');
+            select.innerHTML = '<option value="" disabled selected>Pilih Tahun Pelajaran</option>';
+            masterSPMB.filter(m => m.status === 'Aktif').forEach(m => {
+                select.innerHTML += `<option value="${m.tahun}">${m.tahun}</option>`;
+            });
+        }
+
+        async function submitBukuTamu(e) {
+            e.preventDefault();
+            if(!getEl('guestType').value) {
+                Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap', text: 'Silakan pilih Tujuan Kunjungan terlebih dahulu.', confirmButtonColor: '#2A5245' });
+                return;
+            }
+
+            const btn = getEl('btnSubmitForm');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loader"></div>';
+            btn.disabled = true;
+
+            await new Promise(r => setTimeout(r, 800)); // Simulating network
+
+            const type = getEl('guestType').value;
+            const now = new Date();
+            const payload = {
+                id: generateId('BT'),
+                timestamp: formatTgl(now.toISOString()),
+                _rawDate: now.toISOString(),
+                tahunPelajaranBukuTamu: SYSTEM_CONFIG.tahunPelajaranBukuTamu,
+                nama: getEl('guestName').value.trim(),
+                whatsapp: getEl('guestWA').value.trim(),
+                jenisTamu: type,
+                instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: ""
+            };
+
+            if(type === 'Umum') {
+                payload.instansi = getEl('guestInstansi').value.trim();
+                payload.keperluan = getEl('guestKeperluan').value.trim();
+            } else {
+                payload.tahunPelajaranSPMB = getEl('spmbTahun').value;
+                payload.namaCalonSiswa = getEl('spmbNamaSiswa').value.trim();
+                payload.tempatLahir = getEl('spmbTempatLahir').value.trim();
+                payload.tanggalLahir = getEl('spmbTanggalLahir').value;
+                payload.asalSekolah = getEl('spmbAsalSekolah').value.trim();
+                payload.alamat = getEl('spmbAlamat').value.trim();
+            }
+
+            bukuTamu.unshift(payload); 
+            localStorage.setItem(LS_KEYS.BUKU_TAMU, JSON.stringify(bukuTamu));
+            
+            getEl('guestForm').reset();
+            getEl('guestType').value = '';
+            getEl('cardUmum').classList.remove('selected');
+            getEl('cardSPMB').classList.remove('selected');
+            getEl('formUmum').classList.add('hidden-section');
+            getEl('formSPMB').classList.add('hidden-section');
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            showSuccessModal(payload);
+        }
+
+        function showSuccessModal(data) {
+            let config = {};
+            if(data.jenisTamu === 'Umum') {
+                config = {
+                    icon: '🎉', title: 'TERIMA KASIH',
+                    msg: '<p>Data kunjungan Anda telah berhasil dicatat.</p><p class="font-bold text-primary mt-2">Selamat datang di SMPIT Mentari Ilmu Karawang.</p>'
+                };
+            } else {
+                const spmbInfo = masterSPMB.find(m => m.tahun === data.tahunPelajaranSPMB);
+                if(spmbInfo && spmbInfo.linkWhatsApp) {
+                    config = {
+                        icon: '🎓', title: 'DATA SPMB TERSIMPAN',
+                        msg: `<p>Terima kasih telah mengisi Buku Tamu SPMB.</p><p>Untuk informasi terbaru SPMB Tahun Pelajaran <b class="text-primary">${data.tahunPelajaranSPMB}</b>, ${spmbInfo.pesanSPMB}</p>`,
+                        action: `<a href="${spmbInfo.linkWhatsApp}" target="_blank" class="inline-flex w-full items-center justify-center bg-[#25D366] hover:bg-[#128C7E] text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md"><i class="fa-brands fa-whatsapp text-xl mr-2"></i> GABUNG GRUP WHATSAPP</a>`
+                    };
+                } else {
+                    const noAdmin = spmbInfo ? spmbInfo.nomorAdmin : '';
+                    config = {
+                        icon: 'ℹ️', title: 'DATA SPMB TERSIMPAN',
+                        msg: `<p>Terima kasih telah mengisi Buku Tamu SPMB.</p><p>Informasi Grup WhatsApp untuk Tahun Pelajaran <b class="text-primary">${data.tahunPelajaranSPMB}</b> belum tersedia.</p><p>${spmbInfo ? spmbInfo.pesanSPMB : 'Silakan hubungi Admin SPMB untuk info selanjutnya.'}</p>`,
+                        action: `<a href="https://wa.me/${noAdmin}" target="_blank" class="inline-flex w-full items-center justify-center bg-primary hover:bg-primaryLight text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md"><i class="fa-solid fa-user-headset text-lg mr-2"></i> HUBUNGI ADMIN</a>`
+                    };
+                }
+            }
+
+            getEl('successIcon').innerText = config.icon;
+            getEl('successTitle').innerText = config.title;
+            getEl('successMessage').innerHTML = config.msg;
+            getEl('successActionContainer').innerHTML = config.action || '';
+            openModal('successModal');
+        }
+
+        // ==========================================
+        // 5. AUTHENTICATION & NAVIGATION
+        // ==========================================
+        function openModal(id) { 
+            getEl(id).classList.remove('hidden-section'); 
+            const pwdInput = getEl(id).querySelector('input[type="text"]');
+            if(pwdInput && pwdInput.id.includes('Password')) {
+                togglePasswordVisibility(pwdInput.id, pwdInput.nextElementSibling.querySelector('i').id);
+            }
+        }
+        function closeModal(id) { getEl(id).classList.add('hidden-section'); }
+        function closeSuccessModal() { closeModal('successModal'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        
+        function toggleSidebar() { 
+            getEl('sidebar').classList.toggle('sidebar-mobile-hidden'); 
+            getEl('mobileSidebarOverlay').classList.toggle('hidden');
+        }
+
+        function loginAdmin(e) {
+            e.preventDefault();
+            const u = getEl('loginUsername').value;
+            const p = getEl('loginPassword').value;
+            
+            const user = masterAkun.find(a => a.username === u && a.password === p);
+            if(user) {
+                if(user.status !== 'Aktif') {
+                    Swal.fire({ icon: 'error', title: 'Akun Tidak Aktif', text: 'Silakan hubungi administrator utama.', confirmButtonColor: '#2A5245' });
+                    return;
+                }
+                const sessionData = { id: user.id, nama: user.nama, username: user.username, role: user.role };
+                localStorage.setItem(LS_KEYS.ADMIN_SESSION, JSON.stringify(sessionData));
+                getEl('loginForm').reset();
+                closeModal('loginModal');
+                checkAdminSession();
+            } else {
+                Swal.fire({ icon: 'error', title: 'Login Gagal', text: 'Username atau password tidak sesuai.', confirmButtonColor: '#2A5245' });
+            }
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
+            activeAdmin = null;
+            checkAdminSession();
+        }
+
+        function checkAdminSession() {
+            const sessionData = localStorage.getItem(LS_KEYS.ADMIN_SESSION);
+            if(sessionData) {
+                activeAdmin = JSON.parse(sessionData);
+                
+                // Update Headers & Profile
+                getEl('adminHeaderName').innerText = activeAdmin.nama.split(' ')[0]; // First name
+                getEl('adminHeaderRole').innerText = activeAdmin.role;
+                getEl('dashHeroName').innerText = activeAdmin.nama.split(' ')[0];
+                
+                getEl('profileName').innerText = activeAdmin.nama;
+                getEl('profileRole').innerText = activeAdmin.role;
+                getEl('profileUsername').innerText = activeAdmin.username;
+                getEl('profileInitials').innerText = activeAdmin.nama.substring(0, 2).toUpperCase();
+
+                // RBAC (Role Based Access Control)
+                const isManajemen = activeAdmin.role === 'Manajemen';
+                getEl('menu-masterAkun').style.display = isManajemen ? 'none' : 'flex';
+                getEl('qa-masterAkun').style.display = isManajemen ? 'none' : 'flex';
+                getEl('btnResetDemo').style.display = isManajemen ? 'none' : 'flex';
+                
+                // Mobile Nav specific handling
+                if(isManajemen) {
+                    getEl('mobnav-masterAkun').innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
+                    getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('profile')");
+                } else {
+                    getEl('mobnav-masterAkun').innerHTML = `<i class="fa-solid fa-users-gear text-xl mb-1"></i><span class="text-[9px] font-bold text-center leading-none">Akun</span>`;
+                    getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('masterAkun')");
+                }
+
+                getEl('public-view').classList.add('hidden-section');
+                getEl('admin-view').classList.remove('hidden-section');
+                switchAdminMenu('dashboard');
+            } else {
+                getEl('admin-view').classList.add('hidden-section');
+                getEl('public-view').classList.remove('hidden-section');
+                getEl('sidebar').classList.remove('sidebar-collapsed');
+            }
+        }
+
+        function switchAdminMenu(menuId) {
+            // Hide all content
+            document.querySelectorAll('.admin-content').forEach(el => el.classList.add('hidden-section'));
+            // Reset nav buttons
+            document.querySelectorAll('.admin-menu-btn').forEach(el => {
+                el.classList.remove('bg-pastelGreen', 'text-primary', 'font-bold');
+                el.classList.add('text-gray-500', 'font-medium');
+            });
+            // Reset mobile nav
+            document.querySelectorAll('#mobileBottomNav button').forEach(el => {
+                el.classList.remove('text-primary');
+                el.classList.add('text-gray-400');
+            });
+
+            // Show active content
+            getEl(`content-${menuId}`).classList.remove('hidden-section');
+            
+            // Highlight sidebar button
+            const btn = getEl(`menu-${menuId}`);
+            if(btn) {
+                btn.classList.add('bg-pastelGreen', 'text-primary', 'font-bold');
+                btn.classList.remove('text-gray-500', 'font-medium');
+            }
+
+            // Highlight mobile button (fuzzy matching for Profile vs MasterAkun based on role)
+            let mobBtnId = menuId;
+            if(menuId === 'profile' && activeAdmin?.role === 'Manajemen') mobBtnId = 'masterAkun'; 
+            const mobBtn = getEl(`mobnav-${mobBtnId}`);
+            if(mobBtn) {
+                mobBtn.classList.add('text-primary');
+                mobBtn.classList.remove('text-gray-400');
+            }
+
+            // Mobile auto-close sidebar
+            if(window.innerWidth < 768) {
+                getEl('sidebar').classList.add('sidebar-mobile-hidden');
+                getEl('mobileSidebarOverlay').classList.add('hidden');
+            }
+
+            // Load specific data
+            if(menuId === 'dashboard') loadDashboard();
+            if(menuId === 'rekap') initRekapFilters();
+            if(menuId === 'dataSPMB') initDataSPMBFilters();
+            if(menuId === 'settingsSPMB') renderTableMasterSPMB();
+            if(menuId === 'masterAkun') renderTableMasterAkun();
+        }
+
+        // ==========================================
+        // 6. DASHBOARD & STATS
+        // ==========================================
+        function loadDashboard() {
+            getEl('dashPeriodeAktif').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
+            updateStatistics();
+            renderChart();
+            renderDashboardSpmbInfo();
+        }
+
+        function updateStatistics() {
+            const curSysYear = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
+            const dataActive = bukuTamu.filter(b => b.tahunPelajaranBukuTamu === curSysYear);
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            getEl('statTotal').innerText = dataActive.length;
+            getEl('statUmum').innerText = dataActive.filter(b => b.jenisTamu === 'Umum').length;
+            getEl('statSPMB').innerText = dataActive.filter(b => b.jenisTamu === 'SPMB').length;
+            getEl('statToday').innerText = dataActive.filter(b => b._rawDate.startsWith(todayStr)).length;
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('visitorChart').getContext('2d');
+            const labels = []; const dataCounts = []; const now = new Date();
+            
+            for(let i=6; i>=0; i--) {
+                const d = new Date(now); d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                labels.push(`${d.getDate()}/${d.getMonth()+1}`);
+                dataCounts.push(bukuTamu.filter(b => b._rawDate.startsWith(dateStr)).length);
+            }
+
+            if(chartInstance) chartInstance.destroy();
+            Chart.defaults.font.family = 'Inter';
+            
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Kunjungan', data: dataCounts,
+                        backgroundColor: '#2A5245', borderRadius: 4, barThickness: 'flex', maxBarThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' }, grid: { color: '#f1f5f9', drawBorder: false } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false, drawBorder: false } }
+                    }
+                }
+            });
+        }
+
+        function renderDashboardSpmbInfo() {
+            const list = getEl('dashboardSpmbInfoList');
+            list.innerHTML = '';
+            masterSPMB.forEach(m => {
+                const badge = m.status === 'Aktif' ? '<span class="w-2 h-2 rounded-full bg-green-500"></span>' : '<span class="w-2 h-2 rounded-full bg-gray-300"></span>';
+                const statusTxt = m.linkWhatsApp ? `<span class="text-xs text-green-600"><i class="fa-brands fa-whatsapp"></i> Grup Aktif</span>` : `<span class="text-xs text-orange-500">Grup Belum Tersedia</span>`;
+                list.innerHTML += `
+                    <li class="py-3 px-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            ${badge}
+                            <span class="font-bold text-gray-700 text-sm">SPMB ${m.tahun}</span>
+                        </div>
+                        ${statusTxt}
+                    </li>
+                `;
+            });
+        }
+
+        // ==========================================
+        // 7. DATA KHUSUS SPMB LOGIC (NEW)
+        // ==========================================
+        function initDataSPMBFilters() {
+            // Filter dropdown populator
+            const selTahunBuku = getEl('filterSpmbTahunBuku');
+            const thnBukuTamuSet = new Set(bukuTamu.map(b => b.tahunPelajaranBukuTamu));
+            thnBukuTamuSet.add(SYSTEM_CONFIG.tahunPelajaranBukuTamu);
+            selTahunBuku.innerHTML = '<option value="Semua">Semua Periode</option>';
+            Array.from(thnBukuTamuSet).sort().reverse().forEach(t => {
+                const selected = t === SYSTEM_CONFIG.tahunPelajaranBukuTamu ? 'selected' : '';
+                selTahunBuku.innerHTML += `<option value="${t}" ${selected}>${t}</option>`;
+            });
+
+            const selTahunTarget = getEl('filterSpmbTahunTarget');
+            selTahunTarget.innerHTML = '<option value="Semua">Semua Tahun</option>';
+            masterSPMB.forEach(m => {
+                selTahunTarget.innerHTML += `<option value="${m.tahun}">${m.tahun}</option>`;
+            });
+
+            filterDataSPMB();
+        }
+
+        function resetFiltersSPMB() {
+            getEl('filterSpmbNama').value = '';
+            getEl('filterSpmbSekolah').value = '';
+            getEl('filterSpmbTahunTarget').value = 'Semua';
+            getEl('filterSpmbTahunBuku').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
+            getEl('filterSpmbWaktu').value = 'Semua';
+            filterDataSPMB();
+        }
+
+        function filterDataSPMB() {
+            const searchNama = getEl('filterSpmbNama').value.toLowerCase();
+            const searchSekolah = getEl('filterSpmbSekolah').value.toLowerCase();
+            const thnTarget = getEl('filterSpmbTahunTarget').value;
+            const thnBuku = getEl('filterSpmbTahunBuku').value;
+            const waktu = getEl('filterSpmbWaktu').value;
+
+            // Only filter guests that are SPMB type
+            let result = bukuTamu.filter(b => b.jenisTamu === 'SPMB');
+
+            if(thnBuku !== 'Semua') result = result.filter(b => b.tahunPelajaranBukuTamu === thnBuku);
+            if(thnTarget !== 'Semua') result = result.filter(b => b.tahunPelajaranSPMB === thnTarget);
+
+            if(waktu !== 'Semua') {
+                const todayStr = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                if(waktu === 'Hari Ini') result = result.filter(b => b._rawDate.startsWith(todayStr));
+                else if(waktu === '7 Hari') {
+                    const last7 = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+                    result = result.filter(b => new Date(b._rawDate) >= last7);
+                }
+                else if(waktu === 'Bulan Ini') result = result.filter(b => b._rawDate.startsWith(now.toISOString().substring(0, 7)));
+            }
+
+            if(searchNama) result = result.filter(b => b.namaCalonSiswa.toLowerCase().includes(searchNama));
+            if(searchSekolah) result = result.filter(b => b.asalSekolah.toLowerCase().includes(searchSekolah));
+
+            filteredSpmbData = result;
+            updateSpmbStats();
+            renderTableDataSPMB();
+        }
+
+        function updateSpmbStats() {
+            getEl('spmbStatTotal').innerText = filteredSpmbData.length;
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            getEl('spmbStatToday').innerText = filteredSpmbData.filter(b => b._rawDate.startsWith(todayStr)).length;
+            
+            const sekolahSet = new Set(filteredSpmbData.map(b => b.asalSekolah.trim().toLowerCase()).filter(s => s));
+            getEl('spmbStatSekolah').innerText = sekolahSet.size;
+        }
+
+        function renderTableDataSPMB() {
+            const tbody = getEl('tableBodyDataSPMB');
+            const emptyState = getEl('tableEmptyStateSPMB');
+            tbody.innerHTML = '';
+
+            if(filteredSpmbData.length === 0) { emptyState.classList.remove('hidden-section'); return; }
+            emptyState.classList.add('hidden-section');
+
+            filteredSpmbData.forEach((b, i) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/80 transition-colors';
+                
+                tr.innerHTML = `
+                    <td class="p-4 text-center text-gray-400 font-medium">${i + 1}</td>
+                    <td class="p-4 whitespace-nowrap">
+                        <div class="text-sm font-semibold text-gray-700">${b.timestamp.split(' ')[0]}</div>
+                        <div class="text-xs text-gray-400">${b.timestamp.split(' ')[1]} WIB</div>
+                    </td>
+                    <td class="p-4">
+                        <div class="font-bold text-gray-800">${b.namaCalonSiswa}</div>
+                        <div class="text-xs text-gray-500 font-medium mt-0.5">${b.tempatLahir}, ${b.tanggalLahir}</div>
+                    </td>
+                    <td class="p-4">
+                        <span class="bg-orange-100 text-orange-700 text-xs px-2.5 py-1 rounded-md font-bold">${b.tahunPelajaranSPMB}</span>
+                    </td>
+                    <td class="p-4 text-sm font-medium text-gray-600">${b.asalSekolah}</td>
+                    <td class="p-4">
+                        <div class="text-xs text-gray-500 truncate max-w-[120px]">Pgn: ${b.nama}</div>
+                        <div class="text-xs text-green-600 font-medium mt-0.5"><a href="https://wa.me/${b.whatsapp.replace(/^0/,'62')}" target="_blank" class="hover:underline"><i class="fa-brands fa-whatsapp"></i> ${b.whatsapp}</a></div>
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="showDetail('${b.id}')" class="text-blue-600 hover:text-white border border-blue-200 hover:border-blue-600 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                            Detail
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+
+        // ==========================================
+        // 8. REKAP DATA & FILTERING (GLOBAL)
+        // ==========================================
+        function initRekapFilters() {
+            const thnBukuTamuSet = new Set(bukuTamu.map(b => b.tahunPelajaranBukuTamu));
+            thnBukuTamuSet.add(SYSTEM_CONFIG.tahunPelajaranBukuTamu); 
+            
+            const selBuku = getEl('filterTahunBuku');
+            selBuku.innerHTML = '<option value="Semua">Semua Periode</option>';
+            Array.from(thnBukuTamuSet).sort().reverse().forEach(t => {
+                const selected = t === SYSTEM_CONFIG.tahunPelajaranBukuTamu ? 'selected' : '';
+                selBuku.innerHTML += `<option value="${t}" ${selected}>${t}</option>`;
+            });
+
+            const selSpmb = getEl('optgroupSPMB');
+            selSpmb.innerHTML = '';
+            masterSPMB.forEach(m => { selSpmb.innerHTML += `<option value="SPMB_${m.tahun}">SPMB ${m.tahun}</option>`; });
+
+            filterData(); 
+        }
+
+        function resetFilters() {
+            getEl('filterSearch').value = '';
+            getEl('filterTahunBuku').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
+            getEl('filterJenisSPMB').value = 'Semua';
+            getEl('filterWaktu').value = 'Semua';
+            filterData();
+        }
+
+        function filterData() {
+            const search = getEl('filterSearch').value.toLowerCase();
+            const tahunBuku = getEl('filterTahunBuku').value;
+            const jenisSpmb = getEl('filterJenisSPMB').value;
+            const waktu = getEl('filterWaktu').value;
+
+            let result = bukuTamu;
+            if(tahunBuku !== 'Semua') result = result.filter(b => b.tahunPelajaranBukuTamu === tahunBuku);
+
+            if(jenisSpmb === 'Umum') result = result.filter(b => b.jenisTamu === 'Umum');
+            else if(jenisSpmb.startsWith('SPMB_')) {
+                const tSpmb = jenisSpmb.replace('SPMB_', '');
+                result = result.filter(b => b.jenisTamu === 'SPMB' && b.tahunPelajaranSPMB === tSpmb);
+            }
+
+            if(waktu !== 'Semua') {
+                const todayStr = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                if(waktu === 'Hari Ini') result = result.filter(b => b._rawDate.startsWith(todayStr));
+                else if(waktu === '7 Hari') {
+                    const last7 = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+                    result = result.filter(b => new Date(b._rawDate) >= last7);
+                }
+                else if(waktu === 'Bulan Ini') result = result.filter(b => b._rawDate.startsWith(now.toISOString().substring(0, 7)));
+            }
+
+            if(search) {
+                result = result.filter(b => b.nama.toLowerCase().includes(search) || b.whatsapp.includes(search) || b.namaCalonSiswa.toLowerCase().includes(search) || b.asalSekolah.toLowerCase().includes(search));
+            }
+
+            filteredData = result;
+            renderTableRekap();
+        }
+
+        function renderTableRekap() {
+            const tbody = getEl('tableBodyRekap');
+            const emptyState = getEl('tableEmptyState');
+            tbody.innerHTML = '';
+
+            if(filteredData.length === 0) { emptyState.classList.remove('hidden-section'); return; }
+            emptyState.classList.add('hidden-section');
+
+            filteredData.forEach((b, i) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/80 transition-colors';
+                const isSpmb = b.jenisTamu === 'SPMB';
+                const jenisBadge = isSpmb ? `<span class="bg-orange-100 text-orange-700 text-xs px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-user-graduate mr-1"></i> SPMB</span>` : `<span class="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-building-user mr-1"></i> Umum</span>`;
+                
+                tr.innerHTML = `
+                    <td class="p-4 text-center text-gray-400 font-medium">${i + 1}</td>
+                    <td class="p-4 whitespace-nowrap">
+                        <div class="text-sm font-semibold text-gray-700">${b.timestamp.split(' ')[0]}</div>
+                        <div class="text-xs text-gray-400">${b.timestamp.split(' ')[1]} WIB</div>
+                    </td>
+                    <td class="p-4">
+                        <div class="font-bold text-gray-800">${b.nama}</div>
+                        <div class="text-xs text-primary font-medium mt-0.5"><a href="https://wa.me/${b.whatsapp.replace(/^0/,'62')}" target="_blank" class="hover:underline"><i class="fa-brands fa-whatsapp"></i> ${b.whatsapp}</a></div>
+                    </td>
+                    <td class="p-4">
+                        ${jenisBadge}
+                        ${isSpmb ? `<div class="text-xs text-gray-500 mt-1 font-medium">Calon: ${b.namaCalonSiswa}</div>` : `<div class="text-xs text-gray-500 mt-1 truncate max-w-[150px]">${b.instansi}</div>`}
+                    </td>
+                    <td class="p-4 text-gray-600 text-sm font-medium">
+                        ${b.tahunPelajaranBukuTamu}
+                        ${isSpmb ? `<div class="text-[10px] text-orange-600 mt-0.5">Tujuan: ${b.tahunPelajaranSPMB}</div>` : ''}
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="showDetail('${b.id}')" class="text-blue-600 hover:text-white border border-blue-200 hover:border-blue-600 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                            Detail
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showDetail(id) {
+            const b = bukuTamu.find(x => x.id === id);
+            if(!b) return;
+
+            const container = getEl('detailContentContainer');
+            let html = '';
+
+            // Section 1: Informasi Kunjungan (Common for both)
+            html += `
+                <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gray-50 rounded-bl-full -mr-4 -mt-4 opacity-50 pointer-events-none"></div>
+                    
+                    <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide border-b border-gray-100 pb-2">
+                        <i class="fa-solid fa-circle-info text-primary"></i> Informasi Kunjungan
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 text-sm relative z-10">
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">ID Tiket</span>
+                            <span class="font-mono text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md text-xs font-semibold">${b.id}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Waktu Kunjungan</span>
+                            <span class="font-medium text-gray-800">${b.timestamp}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Tahun Buku Tamu</span>
+                            <span class="font-medium text-gray-800">${b.tahunPelajaranBukuTamu}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Jenis Tamu</span>
+                            <span class="font-bold px-2 py-0.5 rounded-md ${b.jenisTamu==='SPMB'?'text-orange-700 bg-orange-50 border border-orange-100':'text-blue-700 bg-blue-50 border border-blue-100'}">${b.jenisTamu}</span>
+                        </div>
+                        <div class="md:col-span-2 pt-2 border-t border-gray-50 border-dashed">
+                            <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Nama Pengunjung</span>
+                            <span class="font-extrabold text-primary text-base md:text-lg">${b.nama}</span>
+                        </div>
+                        <div class="md:col-span-2">
+                            <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">WhatsApp</span>
+                            <a href="https://wa.me/${b.whatsapp.replace(/^0/,'62')}" target="_blank" class="font-bold text-green-600 hover:text-green-700 hover:underline flex items-center gap-1.5 w-fit">
+                                <i class="fa-brands fa-whatsapp text-lg"></i> ${b.whatsapp}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Section 2: Specific Data Based on Type
+            if(b.jenisTamu === 'SPMB') {
+                html += `
+                    <div class="bg-pastelOrange/30 p-5 rounded-2xl shadow-sm border border-orange-100 relative overflow-hidden">
+                        <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide border-b border-orange-200/50 pb-2">
+                            <i class="fa-solid fa-child-reaching text-orange-500"></i> Data Calon Siswa (SPMB)
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6 text-sm relative z-10">
+                            <div class="md:col-span-2">
+                                <span class="block text-[10px] font-bold text-orange-400/80 mb-1 tracking-widest uppercase">Tahun Diminati</span>
+                                <span class="font-extrabold text-orange-600 bg-white border border-orange-200 px-3 py-1 rounded-lg text-base shadow-sm">${b.tahunPelajaranSPMB}</span>
+                            </div>
+                            <div class="md:col-span-2 pt-2 border-t border-orange-100/50">
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Nama Calon Siswa</span>
+                                <span class="font-bold text-gray-800 text-base">${b.namaCalonSiswa}</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Tempat Lahir</span>
+                                <span class="font-medium text-gray-800">${b.tempatLahir}</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Tanggal Lahir</span>
+                                <span class="font-medium text-gray-800">${b.tanggalLahir}</span>
+                            </div>
+                            <div class="md:col-span-2">
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Asal Sekolah</span>
+                                <span class="font-medium text-gray-800 bg-white px-3 py-1.5 rounded-lg border border-orange-50 block">${b.asalSekolah}</span>
+                            </div>
+                            <div class="md:col-span-2">
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Alamat Domisili</span>
+                                <span class="font-medium text-gray-700 leading-relaxed block bg-white px-3 py-2 rounded-lg border border-orange-50">${b.alamat}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                 html += `
+                    <div class="bg-pastelBlue/40 p-5 rounded-2xl shadow-sm border border-blue-100 relative overflow-hidden">
+                        <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide border-b border-blue-200/50 pb-2">
+                            <i class="fa-solid fa-briefcase text-blue-500"></i> Detail Keperluan Umum
+                        </h4>
+                        <div class="grid grid-cols-1 gap-y-4 text-sm relative z-10">
+                            <div>
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Asal Instansi / Pribadi</span>
+                                <span class="font-bold text-gray-800 bg-white px-3 py-1.5 rounded-lg border border-blue-50 inline-block shadow-sm">${b.instansi}</span>
+                            </div>
+                            <div class="pt-2 border-t border-blue-100/50">
+                                <span class="block text-[10px] font-bold text-gray-400 mb-2 tracking-widest uppercase">Keperluan Kunjungan</span>
+                                <span class="font-medium text-gray-700 leading-relaxed block bg-white p-4 border border-blue-50 rounded-xl shadow-sm min-h-[80px]">${b.keperluan}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            openModal('detailModal');
+        }
+
+        // Export Functions for Global Rekap
+        function exportExcel() {
+            if(filteredData.length === 0) return Swal.fire('Kosong', 'Tidak ada data untuk diekspor.', 'info');
+            const exportData = filteredData.map((b, i) => ({
+                'No': i + 1, 'ID': b.id, 'Waktu Kunjungan': b.timestamp, 'Thn Buku Tamu': b.tahunPelajaranBukuTamu,
+                'Nama Pengunjung': b.nama, 'WhatsApp': b.whatsapp, 'Jenis Tamu': b.jenisTamu,
+                'Instansi (Umum)': b.instansi || '-', 'Keperluan (Umum)': b.keperluan || '-',
+                'Thn SPMB (SPMB)': b.tahunPelajaranSPMB || '-', 'Nama Calon Siswa (SPMB)': b.namaCalonSiswa || '-',
+                'TTL Calon Siswa (SPMB)': (b.tempatLahir && b.tanggalLahir) ? `${b.tempatLahir}, ${b.tanggalLahir}` : '-',
+                'Asal Sekolah (SPMB)': b.asalSekolah || '-', 'Alamat (SPMB)': b.alamat || '-'
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap Tamu Global");
+            XLSX.writeFile(wb, `Rekap_Tamu_MentariIlmu_${new Date().getTime()}.xlsx`);
+        }
+
+        function exportPDF() {
+            if(filteredData.length === 0) return Swal.fire('Kosong', 'Tidak ada data untuk diekspor.', 'info');
+            const doc = new jspdf.jsPDF('l', 'mm', 'a4'); 
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text("REKAP BUKU TAMU GLOBAL - SMPIT MENTARI ILMU", 14, 15);
+            doc.setFontSize(9); doc.setFont("helvetica", "normal");
+            doc.text(`Periode Cetak: ${SYSTEM_CONFIG.tahunPelajaranBukuTamu} | Dicetak: ${formatTgl(new Date().toISOString())}`, 14, 21);
+
+            const tableData = filteredData.map((b, i) => [
+                i + 1, b.timestamp.split(' ')[0], b.nama, b.whatsapp, b.jenisTamu,
+                b.jenisTamu === 'SPMB' ? b.tahunPelajaranSPMB : '-', b.jenisTamu === 'SPMB' ? b.namaCalonSiswa : (b.instansi || '-')
+            ]);
+            doc.autoTable({
+                head: [['No', 'Tanggal', 'Nama', 'WhatsApp', 'Jenis', 'Thn SPMB', 'Keterangan']],
+                body: tableData, startY: 26, theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2 }, headStyles: { fillColor: [42, 82, 69] } 
+            });
+            doc.save(`Rekap_Global_${new Date().getTime()}.pdf`);
+        }
+
+        // Export Functions for Data SPMB Menu
+        function exportExcelSPMB() {
+            if(filteredSpmbData.length === 0) return Swal.fire('Kosong', 'Tidak ada data SPMB untuk diekspor.', 'info');
+            const exportData = filteredSpmbData.map((b, i) => ({
+                'No': i + 1, 'ID': b.id, 'Waktu Kunjungan': b.timestamp,
+                'Tahun Diminati': b.tahunPelajaranSPMB, 'Tahun Buku Tamu': b.tahunPelajaranBukuTamu,
+                'Nama Calon Siswa': b.namaCalonSiswa, 'Tempat Lahir': b.tempatLahir, 'Tanggal Lahir': b.tanggalLahir,
+                'Asal Sekolah': b.asalSekolah, 'Alamat Lengkap': b.alamat,
+                'Nama Pendamping/Ortu': b.nama, 'WhatsApp Kontak': b.whatsapp
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data Pendaftar SPMB");
+            XLSX.writeFile(wb, `Data_SPMB_MentariIlmu_${new Date().getTime()}.xlsx`);
+        }
+
+        function exportPDFSPMB() {
+            if(filteredSpmbData.length === 0) return Swal.fire('Kosong', 'Tidak ada data SPMB untuk diekspor.', 'info');
+            const doc = new jspdf.jsPDF('l', 'mm', 'a4'); 
+            doc.setFontSize(12); doc.setFont("helvetica", "bold");
+            doc.text("DATA KUNJUNGAN CALON SISWA SPMB - SMPIT MENTARI ILMU", 14, 15);
+            doc.setFontSize(9); doc.setFont("helvetica", "normal");
+            doc.text(`Total Data: ${filteredSpmbData.length} | Dicetak: ${formatTgl(new Date().toISOString())}`, 14, 21);
+
+            const tableData = filteredSpmbData.map((b, i) => [
+                i + 1, b.timestamp.split(' ')[0], b.tahunPelajaranSPMB, b.namaCalonSiswa, 
+                `${b.tempatLahir}, ${b.tanggalLahir}`, b.asalSekolah, b.nama, b.whatsapp
+            ]);
+            doc.autoTable({
+                head: [['No', 'Tanggal', 'Thn Diminati', 'Nama Calon Siswa', 'Tempat & Tgl Lahir', 'Asal Sekolah', 'Pendamping', 'WhatsApp']],
+                body: tableData, startY: 26, theme: 'grid',
+                styles: { fontSize: 8, cellPadding: 2 }, headStyles: { fillColor: [234, 88, 12] } // Orange theme for SPMB
+            });
+            doc.save(`Data_SPMB_${new Date().getTime()}.pdf`);
+        }
+
+        // ==========================================
+        // 9. MASTER SPMB (CRUD)
+        // ==========================================
+        function renderTableMasterSPMB() {
+            const tbody = getEl('tableBodySPMB');
+            tbody.innerHTML = '';
+            masterSPMB.forEach((m, idx) => {
+                const statusBadge = m.status === 'Aktif' 
+                    ? `<span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-green-200">Aktif</span>`
+                    : `<span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-gray-200">Nonaktif</span>`;
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/80 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-center text-gray-400 font-medium">${idx + 1}</td>
+                    <td class="p-4 font-bold text-gray-800">${m.tahun}</td>
+                    <td class="p-4 text-sm text-blue-600 truncate max-w-[200px]">${m.linkWhatsApp ? `<a href="${m.linkWhatsApp}" target="_blank" class="hover:underline font-medium"><i class="fa-brands fa-whatsapp"></i> Link Tersedia</a>` : '<span class="text-gray-400 text-xs italic">Kosong</span>'}</td>
+                    <td class="p-4 text-sm text-gray-600 font-medium">${m.nomorAdmin}<br><div class="mt-1">${statusBadge}</div></td>
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <button onclick='editMasterSPMB(${JSON.stringify(m)})' class="text-gray-500 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 w-8 h-8 rounded-lg transition-colors mr-1" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="deleteMasterSPMB('${m.id}', '${m.tahun}')" class="text-gray-500 hover:text-red-600 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 w-8 h-8 rounded-lg transition-colors" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            populatePublicSPMBDropdown();
+        }
+
+        function openSPMBModal() {
+            getEl('spmbForm').reset();
+            getEl('spmbId').value = '';
+            getEl('spmbModalTitle').innerText = 'Tambah Tahun Pelajaran SPMB';
+            openModal('spmbModal');
+        }
+
+        function editMasterSPMB(m) {
+            getEl('spmbId').value = m.id;
+            getEl('setSpmbTahun').value = m.tahun;
+            getEl('setSpmbLink').value = m.linkWhatsApp;
+            getEl('setSpmbAdmin').value = m.nomorAdmin;
+            getEl('setSpmbPesan').value = m.pesanSPMB;
+            getEl('setSpmbStatus').value = m.status;
+            getEl('spmbModalTitle').innerText = 'Edit Tahun Pelajaran SPMB';
+            openModal('spmbModal');
+        }
+
+        function saveMasterSPMB(e) {
+            e.preventDefault();
+            const id = getEl('spmbId').value;
+            const newData = {
+                tahun: getEl('setSpmbTahun').value.trim(), linkWhatsApp: getEl('setSpmbLink').value.trim(),
+                nomorAdmin: getEl('setSpmbAdmin').value.trim(), pesanSPMB: getEl('setSpmbPesan').value.trim(), status: getEl('setSpmbStatus').value
+            };
+
+            if(id) {
+                const idx = masterSPMB.findIndex(m => m.id === id);
+                if(idx > -1) masterSPMB[idx] = { ...masterSPMB[idx], ...newData };
+                Swal.fire({icon:'success', title:'Tersimpan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+            } else {
+                newData.id = generateId('SPMB'); masterSPMB.push(newData);
+                Swal.fire({icon:'success', title:'Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+            }
+            localStorage.setItem(LS_KEYS.MASTER_SPMB, JSON.stringify(masterSPMB));
+            closeModal('spmbModal'); renderTableMasterSPMB();
+        }
+
+        function deleteMasterSPMB(id, tahun) {
+            Swal.fire({
+                title: 'Hapus Data?', text: `Yakin ingin menghapus SPMB Tahun ${tahun}?`, icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    masterSPMB = masterSPMB.filter(m => m.id !== id);
+                    localStorage.setItem(LS_KEYS.MASTER_SPMB, JSON.stringify(masterSPMB));
+                    renderTableMasterSPMB();
+                    Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+                }
+            });
+        }
+
+        // ==========================================
+        // 10. MASTER AKUN (CRUD)
+        // ==========================================
+        function renderTableMasterAkun() {
+            const tbody = getEl('tableBodyAkun');
+            tbody.innerHTML = '';
+            masterAkun.forEach((m, idx) => {
+                const statusBadge = m.status === 'Aktif' 
+                    ? `<span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-green-200">Aktif</span>`
+                    : `<span class="bg-red-100 text-red-700 text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-red-200">Nonaktif</span>`;
+                
+                const roleBadge = m.role === 'Admin' ? 'text-purple-600 bg-pastelPurple border-purple-200' : 'text-blue-600 bg-pastelBlue border-blue-200';
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/80 transition-colors';
+                tr.innerHTML = `
+                    <td class="p-4 text-center text-gray-400 font-medium">${idx + 1}</td>
+                    <td class="p-4 font-bold text-gray-800">${m.nama}</td>
+                    <td class="p-4">
+                        <div class="text-sm font-mono text-gray-600 mb-1">${m.username}</div>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide border ${roleBadge}">${m.role}</span>
+                    </td>
+                    <td class="p-4">${statusBadge}</td>
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <button onclick='editAkun(${JSON.stringify(m)})' class="text-gray-500 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 w-8 h-8 rounded-lg transition-colors mr-1" title="Edit Akun"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="deleteAkun('${m.id}', '${m.username}')" class="text-gray-500 hover:text-red-600 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 w-8 h-8 rounded-lg transition-colors" title="Hapus Akun"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openAkunModal() {
+            getEl('akunForm').reset();
+            getEl('akunId').value = '';
+            getEl('akunModalTitle').innerText = 'Tambah Akun Baru';
+            getEl('setAkunPassword').required = true;
+            getEl('lblAkunPwd').innerHTML = 'Password <span class="text-red-500">*</span>';
+            getEl('helpAkunPwd').classList.add('hidden');
+            openModal('akunModal');
+        }
+
+        function editAkun(m) {
+            getEl('akunId').value = m.id;
+            getEl('setAkunNama').value = m.nama;
+            getEl('setAkunUsername').value = m.username;
+            getEl('setAkunPassword').value = ''; 
+            getEl('setAkunPassword').required = false; 
+            getEl('setAkunRole').value = m.role;
+            getEl('setAkunStatus').value = m.status;
+            
+            getEl('akunModalTitle').innerText = 'Edit Akun: ' + m.username;
+            getEl('lblAkunPwd').innerHTML = 'Reset Password Baru';
+            getEl('helpAkunPwd').classList.remove('hidden');
+            openModal('akunModal');
+        }
+
+        function saveMasterAkun(e) {
+            e.preventDefault();
+            const id = getEl('akunId').value;
+            const uName = getEl('setAkunUsername').value.trim();
+            const pwd = getEl('setAkunPassword').value;
+
+            // Check username duplicate
+            const isDup = masterAkun.some(a => a.username === uName && a.id !== id);
+            if(isDup) { Swal.fire('Username Terpakai', 'Silakan gunakan username lain.', 'error'); return; }
+
+            if(id) {
+                const idx = masterAkun.findIndex(a => a.id === id);
+                if(idx > -1) {
+                    masterAkun[idx].nama = getEl('setAkunNama').value.trim();
+                    masterAkun[idx].username = uName;
+                    masterAkun[idx].role = getEl('setAkunRole').value;
+                    masterAkun[idx].status = getEl('setAkunStatus').value;
+                    if(pwd) masterAkun[idx].password = pwd; // update if provided
+                }
+                Swal.fire({icon:'success', title:'Akun Diperbarui', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+            } else {
+                masterAkun.push({
+                    id: generateId('USR'), nama: getEl('setAkunNama').value.trim(), username: uName, password: pwd,
+                    role: getEl('setAkunRole').value, status: getEl('setAkunStatus').value
+                });
+                Swal.fire({icon:'success', title:'Akun Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+            }
+            localStorage.setItem(LS_KEYS.MASTER_AKUN, JSON.stringify(masterAkun));
+            closeModal('akunModal'); renderTableMasterAkun();
+        }
+
+        function deleteAkun(id, username) {
+            if(activeAdmin && activeAdmin.id === id) {
+                Swal.fire('Akses Ditolak', 'Anda tidak dapat menghapus akun yang sedang digunakan.', 'error');
+                return;
+            }
+            Swal.fire({
+                title: 'Hapus Akun?', text: `Yakin ingin menghapus pengguna '${username}'?`, icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    masterAkun = masterAkun.filter(m => m.id !== id);
+                    localStorage.setItem(LS_KEYS.MASTER_AKUN, JSON.stringify(masterAkun));
+                    renderTableMasterAkun();
+                    Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+                }
+            });
+        }
+
+        // ==========================================
+        // 11. SYSTEM CONFIG & RESET
+        // ==========================================
+        function updateActiveAcademicYear(e) {
+            e.preventDefault();
+            const val = getEl('sysConfigTahunAktif').value;
+            SYSTEM_CONFIG.tahunPelajaranBukuTamu = val;
+            localStorage.setItem(LS_KEYS.SYSTEM_CONFIG, JSON.stringify(SYSTEM_CONFIG));
+            
+            getEl('headerTahunBukuTamu').innerText = val;
+            getEl('headerAdminTahunBukuTamu').innerText = val;
+            
+            Swal.fire({icon:'success', title:'Tersimpan', text:`Periode Buku Tamu aktif diubah menjadi ${val}.`, confirmButtonColor: '#2A5245'});
+        }
+
+        function resetDemoData() {
+            Swal.fire({
+                title: 'Reset Semua Data?',
+                html: '<p class="text-sm">Buku Tamu, Master SPMB, Master Akun, dan Konfigurasi akan dikembalikan ke kondisi awal (Data Dummy).</p>',
+                icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Reset Total'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Object.values(LS_KEYS).forEach(k => localStorage.removeItem(k));
+                    
+                    // Re-init full system
+                    initApp(); 
+                    if(activeAdmin) switchAdminMenu('dashboard');
+                    Swal.fire({title: 'Berhasil', text: 'Sistem telah dikembalikan ke kondisi Demo awal.', icon: 'success', confirmButtonColor: '#2A5245'});
+                }
+            });
+        }
+
+        // Initialize Application
+        window.onload = initApp;
+    </script>
 </body>
-
 </html>
