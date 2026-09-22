@@ -42,15 +42,16 @@
                         pastelBlue: '#EFF6FF',
                         pastelGreen: '#F0FDF4',
                         pastelOrange: '#FFF7ED',
+                        pastelPink: '#FDF2F8',
                         pastelPurple: '#FAF5FF'
                     },
                     boxShadow: {
                         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'card': '0 10px 25px -5px rgba(0, 0, 0, 0.03)',
+                        'card': '0 8px 20px -5px rgba(0, 0, 0, 0.04)',
                     },
                     borderRadius: {
                         'xl': '1rem',
-                        '2xl': '1.5rem',
+                        '2xl': '1.25rem',
                         '3xl': '2rem',
                     }
                 }
@@ -261,9 +262,19 @@
                                     <!-- Populated dynamically -->
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap Calon Siswa <span class="text-red-500">*</span></label>
-                                <input type="text" id="spmbNamaSiswa" placeholder="Nama sesuai akta kelahiran" class="modern-input bg-white">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap Calon Siswa <span class="text-red-500">*</span></label>
+                                    <input type="text" id="spmbNamaSiswa" placeholder="Nama sesuai akta kelahiran" class="modern-input bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
+                                    <select id="spmbJenisKelamin" class="modern-input bg-white cursor-pointer">
+                                        <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
@@ -302,7 +313,6 @@
         </main>
     </div>
 
-
     <!-- ========================================== -->
     <!-- ADMIN VIEW: EXECUTIVE DASHBOARD            -->
     <!-- ========================================== -->
@@ -310,9 +320,9 @@
         
         <!-- Mobile Header & Overlay -->
         <div class="md:hidden bg-primary text-white p-4 flex justify-between items-center shadow-md z-30 sticky top-0">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
                 <img src="https://mentariilmu.org/logo.png" alt="Logo" class="w-8 h-8 object-contain bg-white rounded-md p-0.5">
-                <h1 class="font-bold text-sm">Buku Tamu Mentari Ilmu</h1>
+                <h1 class="font-bold text-sm">MIIS - Buku Tamu</h1>
             </div>
             <button onclick="toggleSidebar()" class="text-2xl p-1"><i class="fa-solid fa-bars"></i></button>
         </div>
@@ -334,29 +344,29 @@
             <!-- Navigation -->
             <nav class="flex-grow p-3 space-y-1">
                 <p class="menu-group-title px-3 pt-4 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Utama</p>
-                <button onclick="switchAdminMenu('dashboard')" id="menu-dashboard" data-tooltip="Dashboard" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all bg-pastelGreen text-primary font-bold">
+                <button onclick="switchAdminMenu('dashboard')" id="menu-dashboard" data-tooltip="Dashboard" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
                     <i class="fa-solid fa-chart-pie w-6 text-center text-lg"></i> <span class="menu-text text-sm">Dashboard</span>
                 </button>
-                <button onclick="switchAdminMenu('rekap')" id="menu-rekap" data-tooltip="Rekap Buku Tamu" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                <button onclick="switchAdminMenu('rekap')" id="menu-rekap" data-tooltip="Rekap Kunjungan" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
                     <i class="fa-solid fa-book-bookmark w-6 text-center text-lg"></i> <span class="menu-text text-sm">Rekap Kunjungan</span>
                 </button>
-                <button onclick="switchAdminMenu('dataSPMB')" id="menu-dataSPMB" data-tooltip="Data Calon Siswa (SPMB)" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                <button onclick="switchAdminMenu('dataSPMB')" id="menu-dataSPMB" data-tooltip="Data SPMB" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
                     <i class="fa-solid fa-users-viewfinder w-6 text-center text-lg"></i> <span class="menu-text text-sm">Data SPMB</span>
                 </button>
 
                 <p class="menu-group-title px-3 pt-5 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Master Data</p>
-                <button onclick="switchAdminMenu('settingsSPMB')" id="menu-settingsSPMB" data-tooltip="Master SPMB" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                <button onclick="switchAdminMenu('settingsSPMB')" id="menu-settingsSPMB" data-tooltip="Master SPMB" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
                     <i class="fa-solid fa-graduation-cap w-6 text-center text-lg"></i> <span class="menu-text text-sm">Master SPMB</span>
                 </button>
-                <button onclick="switchAdminMenu('masterAkun')" id="menu-masterAkun" data-tooltip="Master Akun" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                <button onclick="switchAdminMenu('masterAkun')" id="menu-masterAkun" data-tooltip="Master Akun" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
                     <i class="fa-solid fa-users-gear w-6 text-center text-lg"></i> <span class="menu-text text-sm">Master Akun</span>
                 </button>
 
                 <p class="menu-group-title px-3 pt-5 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pengaturan</p>
-                <button onclick="switchAdminMenu('settingsSystem')" id="menu-settingsSystem" data-tooltip="Konfigurasi" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                <button onclick="switchAdminMenu('settingsSystem')" id="menu-settingsSystem" data-tooltip="Konfigurasi" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
                     <i class="fa-solid fa-sliders w-6 text-center text-lg"></i> <span class="menu-text text-sm">Sistem Global</span>
                 </button>
-                <button onclick="switchAdminMenu('profile')" id="menu-profile" data-tooltip="Profil Saya" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-gray-50 hover:text-primary transition-all font-medium">
+                <button onclick="switchAdminMenu('profile')" id="menu-profile" data-tooltip="Profil Saya" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
                     <i class="fa-regular fa-id-badge w-6 text-center text-lg"></i> <span class="menu-text text-sm">Profil Saya</span>
                 </button>
             </nav>
@@ -366,7 +376,7 @@
                 <button onclick="resetDemoData()" id="btnResetDemo" data-tooltip="Reset Data" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-orange-500 hover:bg-orange-50 transition-all font-medium">
                     <i class="fa-solid fa-rotate-left w-6 text-center text-lg"></i> <span class="menu-text text-sm">Reset Data Demo</span>
                 </button>
-                <button onclick="logoutAdmin()" data-tooltip="Logout" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium">
+                <button onclick="logoutAdmin()" data-tooltip="Logout" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-all font-bold">
                     <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center text-lg"></i> <span class="menu-text text-sm">Keluar Aplikasi</span>
                 </button>
             </div>
@@ -410,10 +420,8 @@
                     
                     <!-- Hero Banner -->
                     <div class="bg-primary rounded-3xl p-6 md:p-8 text-white relative overflow-hidden shadow-card mb-6">
-                        <!-- Decorative shapes -->
                         <div class="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 rounded-full bg-white opacity-5"></div>
                         <div class="absolute bottom-0 right-20 -mb-10 w-32 h-32 rounded-full bg-white opacity-10"></div>
-                        
                         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div>
                                 <span class="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block backdrop-blur-sm border border-white/20">
@@ -431,7 +439,7 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                             <div onclick="switchAdminMenu('rekap')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
                                 <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-table-list"></i></div>
-                                <p class="font-bold text-gray-700 text-sm">Rekap Umum</p>
+                                <p class="font-bold text-gray-700 text-sm">Rekap Data</p>
                             </div>
                             <div onclick="switchAdminMenu('dataSPMB')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-orange-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
                                 <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-users-viewfinder"></i></div>
@@ -449,41 +457,60 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Stats Grid -->
+                        <!-- Stats Grid (REDESIGNED based on reference) -->
                         <div class="lg:col-span-2 space-y-6">
                             <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider px-1">Ringkasan Statistik</h3>
                             <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-pastelBlue/50 rounded-2xl p-5 border border-blue-100">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wider">Total Tamu</p>
-                                        <i class="fa-solid fa-users text-blue-300"></i>
+                                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Total Tamu</span>
+                                        <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-500 flex items-center justify-center text-lg shrink-0">
+                                            <i class="fa-solid fa-users"></i>
+                                        </div>
                                     </div>
-                                    <h3 class="text-4xl font-extrabold text-blue-900" id="statTotal">0</h3>
-                                </div>
-                                <div class="bg-pastelGreen/50 rounded-2xl p-5 border border-green-100">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <p class="text-xs font-bold text-green-600 uppercase tracking-wider">Hari Ini</p>
-                                        <i class="fa-solid fa-calendar-day text-green-300"></i>
-                                    </div>
-                                    <h3 class="text-4xl font-extrabold text-green-900" id="statToday">0</h3>
-                                </div>
-                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tamu Umum</p>
-                                    <div class="flex items-end justify-between">
-                                        <h3 class="text-3xl font-extrabold text-gray-700" id="statUmum">0</h3>
-                                        <div class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center"><i class="fa-solid fa-building-user text-sm"></i></div>
+                                    <div>
+                                        <h4 class="text-3xl font-extrabold text-gray-800" id="statTotal">0</h4>
+                                        <p class="text-[10px] text-gray-400 mt-1 font-medium">Pengunjung keseluruhan</p>
                                     </div>
                                 </div>
-                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tamu SPMB</p>
-                                    <div class="flex items-end justify-between">
-                                        <h3 class="text-3xl font-extrabold text-gray-700" id="statSPMB">0</h3>
-                                        <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-400 flex items-center justify-center"><i class="fa-solid fa-user-graduate text-sm"></i></div>
+                                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Hari Ini</span>
+                                        <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-500 flex items-center justify-center text-lg shrink-0">
+                                            <i class="fa-solid fa-calendar-day"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-3xl font-extrabold text-gray-800" id="statToday">0</h4>
+                                        <p class="text-[10px] text-gray-400 mt-1 font-medium">Kunjungan masuk hari ini</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu Umum</span>
+                                        <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-lg shrink-0">
+                                            <i class="fa-solid fa-building-user"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-3xl font-extrabold text-gray-800" id="statUmum">0</h4>
+                                        <p class="text-[10px] text-gray-400 mt-1 font-medium">Kunjungan keperluan umum</p>
+                                    </div>
+                                </div>
+                                <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu SPMB</span>
+                                        <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-500 flex items-center justify-center text-lg shrink-0">
+                                            <i class="fa-solid fa-user-graduate"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-3xl font-extrabold text-gray-800" id="statSPMB">0</h4>
+                                        <p class="text-[10px] text-gray-400 mt-1 font-medium">Kunjungan informasi SPMB</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Chart -->
                             <div class="bg-white p-6 rounded-2xl shadow-card border border-gray-100 w-full">
                                 <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line text-primary text-opacity-50"></i> Grafik Kunjungan (7 Hari)</h3>
                                 <div class="chart-container">
@@ -492,7 +519,6 @@
                             </div>
                         </div>
 
-                        <!-- Side Info -->
                         <div class="space-y-6">
                             <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider px-1">Informasi SPMB</h3>
                             <div class="bg-white rounded-2xl shadow-card border border-gray-100 p-1">
@@ -521,28 +547,62 @@
                         </div>
                     </div>
 
-                    <!-- Summary Cards SPMB -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Calon Siswa</p>
-                                <h4 class="text-2xl font-extrabold text-gray-800 mt-1" id="spmbStatTotal">0</h4>
+                    <!-- Summary Cards SPMB (REDESIGNED) -->
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md col-span-2 md:col-span-1">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Total Calon Siswa</span>
+                                <div class="w-8 h-8 rounded-lg bg-pastelOrange text-orange-500 flex items-center justify-center text-sm shrink-0">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-pastelOrange text-orange-600 flex items-center justify-center text-xl"><i class="fa-solid fa-users"></i></div>
+                            <div>
+                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatTotal">0</h4>
+                            </div>
                         </div>
-                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Kunjungan Hari Ini</p>
-                                <h4 class="text-2xl font-extrabold text-gray-800 mt-1" id="spmbStatToday">0</h4>
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Hari Ini</span>
+                                <div class="w-8 h-8 rounded-lg bg-pastelGreen text-green-500 flex items-center justify-center text-sm shrink-0">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-pastelGreen text-green-600 flex items-center justify-center text-xl"><i class="fa-solid fa-calendar-check"></i></div>
+                            <div>
+                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatToday">0</h4>
+                            </div>
                         </div>
-                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sekolah Asal</p>
-                                <h4 class="text-2xl font-extrabold text-gray-800 mt-1" id="spmbStatSekolah">0</h4>
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Sekolah Asal</span>
+                                <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-500 flex items-center justify-center text-sm shrink-0">
+                                    <i class="fa-solid fa-school"></i>
+                                </div>
                             </div>
-                            <div class="w-12 h-12 rounded-xl bg-pastelBlue text-blue-600 flex items-center justify-center text-xl"><i class="fa-solid fa-school"></i></div>
+                            <div>
+                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatSekolah">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Laki-laki</span>
+                                <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-500 flex items-center justify-center text-sm shrink-0">
+                                    <i class="fa-solid fa-person"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatLaki">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Perempuan</span>
+                                <div class="w-8 h-8 rounded-lg bg-pastelPink text-pink-500 flex items-center justify-center text-sm shrink-0">
+                                    <i class="fa-solid fa-person-dress"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatPerempuan">0</h4>
+                            </div>
                         </div>
                     </div>
 
@@ -553,14 +613,14 @@
                                 <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Nama Calon Siswa</label>
                                 <div class="relative">
                                     <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400"></i>
-                                    <input type="text" id="filterSpmbNama" placeholder="Cari nama..." oninput="filterDataSPMB()" class="modern-input !py-2 !pl-10 !text-sm">
+                                    <input type="text" id="filterSpmbNama" placeholder="Cari..." oninput="filterDataSPMB()" class="modern-input !py-2 !pl-10 !text-sm">
                                 </div>
                             </div>
                             <div class="md:col-span-1">
                                 <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Asal Sekolah</label>
                                 <div class="relative">
                                     <i class="fa-solid fa-school absolute left-3.5 top-3 text-gray-400 text-xs"></i>
-                                    <input type="text" id="filterSpmbSekolah" placeholder="Cari sekolah..." oninput="filterDataSPMB()" class="modern-input !py-2 !pl-10 !text-sm">
+                                    <input type="text" id="filterSpmbSekolah" placeholder="Cari..." oninput="filterDataSPMB()" class="modern-input !py-2 !pl-10 !text-sm">
                                 </div>
                             </div>
                             <div>
@@ -571,21 +631,20 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Periode Buku Tamu</label>
-                                <select id="filterSpmbTahunBuku" onchange="filterDataSPMB()" class="modern-input !py-2 !text-sm cursor-pointer">
-                                    <option value="Semua">Semua Periode</option>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Jenis Kelamin</label>
+                                <select id="filterSpmbJenisKelamin" onchange="filterDataSPMB()" class="modern-input !py-2 !text-sm cursor-pointer">
+                                    <option value="Semua">Semua Jenis Kelamin</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Waktu</label>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Rentang Tanggal</label>
                                 <div class="flex gap-2">
-                                    <select id="filterSpmbWaktu" onchange="filterDataSPMB()" class="modern-input !py-2 !text-sm cursor-pointer flex-grow">
-                                        <option value="Semua">Semua Waktu</option>
-                                        <option value="Hari Ini">Hari Ini</option>
-                                        <option value="7 Hari">7 Hari Terakhir</option>
-                                        <option value="Bulan Ini">Bulan Ini</option>
-                                    </select>
-                                    <button onclick="resetFiltersSPMB()" class="w-10 h-10 shrink-0 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 flex items-center justify-center transition-colors" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
+                                    <button id="btnRentangSPMB" onclick="openDateRangeModal('spmb')" class="modern-input !py-2 !text-sm flex-grow text-left text-gray-500 truncate bg-white cursor-pointer hover:bg-gray-50 flex items-center transition-colors">
+                                        <i class="fa-regular fa-calendar mr-2 shrink-0"></i> <span id="textRentangSPMB" class="truncate">Semua Tanggal</span>
+                                    </button>
+                                    <button onclick="resetFiltersSPMB()" class="w-10 h-10 shrink-0 rounded-xl border border-gray-200 text-gray-500 bg-white hover:bg-pastelGreen hover:text-primary transition-all flex items-center justify-center" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -600,6 +659,7 @@
                                         <th class="p-4 font-bold w-12 text-center">No</th>
                                         <th class="p-4 font-bold">Waktu</th>
                                         <th class="p-4 font-bold">Calon Siswa</th>
+                                        <th class="p-4 font-bold">Jenis Kelamin</th>
                                         <th class="p-4 font-bold">Tahun Diminati</th>
                                         <th class="p-4 font-bold">Asal Sekolah</th>
                                         <th class="p-4 font-bold">Kontak Info</th>
@@ -635,6 +695,58 @@
                         </div>
                     </div>
 
+                    <!-- Summary Cards Rekap Kunjungan (NEWLY ADDED) -->
+                    <div id="rekapSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Total Kunjungan</span>
+                                <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-500 flex items-center justify-center text-lg shrink-0">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatTotal">0</h4>
+                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Berdasarkan filter</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu Umum</span>
+                                <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-lg shrink-0">
+                                    <i class="fa-solid fa-building-user"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatUmum">0</h4>
+                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Berdasarkan filter</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu SPMB</span>
+                                <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-500 flex items-center justify-center text-lg shrink-0">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatSPMB">0</h4>
+                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Berdasarkan filter</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Hari Ini</span>
+                                <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-500 flex items-center justify-center text-lg shrink-0">
+                                    <i class="fa-solid fa-calendar-day"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatToday">0</h4>
+                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Masuk hari ini</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Filters Card -->
                     <div class="bg-white p-5 rounded-2xl shadow-card border border-gray-100 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -646,12 +758,6 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Periode Buku Tamu</label>
-                                <select id="filterTahunBuku" onchange="filterData()" class="modern-input !py-2 !text-sm cursor-pointer">
-                                    <option value="Semua">Semua Periode</option>
-                                </select>
-                            </div>
-                            <div>
                                 <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Jenis Tamu</label>
                                 <select id="filterJenisSPMB" onchange="filterData()" class="modern-input !py-2 !text-sm cursor-pointer">
                                     <option value="Semua">Semua Jenis</option>
@@ -659,16 +765,13 @@
                                     <optgroup label="Tamu SPMB" id="optgroupSPMB"></optgroup>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Waktu</label>
+                            <div class="md:col-span-2">
+                                <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Rentang Tanggal</label>
                                 <div class="flex gap-2">
-                                    <select id="filterWaktu" onchange="filterData()" class="modern-input !py-2 !text-sm cursor-pointer flex-grow">
-                                        <option value="Semua">Semua Waktu</option>
-                                        <option value="Hari Ini">Hari Ini</option>
-                                        <option value="7 Hari">7 Hari Terakhir</option>
-                                        <option value="Bulan Ini">Bulan Ini</option>
-                                    </select>
-                                    <button onclick="resetFilters()" class="w-10 h-10 shrink-0 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 flex items-center justify-center transition-colors" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
+                                    <button id="btnRentangRekap" onclick="openDateRangeModal('rekap')" class="modern-input !py-2 !text-sm flex-grow text-left text-gray-500 truncate bg-white cursor-pointer hover:bg-gray-50 flex items-center transition-colors">
+                                        <i class="fa-regular fa-calendar mr-2 shrink-0"></i> <span id="textRentangRekap" class="truncate">Semua Tanggal</span>
+                                    </button>
+                                    <button onclick="resetFilters()" class="w-10 h-10 shrink-0 rounded-xl border border-gray-200 text-gray-500 bg-white hover:bg-pastelGreen hover:text-primary transition-all flex items-center justify-center" title="Reset Filter"><i class="fa-solid fa-rotate-right"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -789,7 +892,7 @@
                                         <option value="2027/2028">2027/2028</option>
                                         <option value="2028/2029">2028/2029</option>
                                     </select>
-                                    <button type="submit" class="w-1/3 bg-primary hover:bg-primaryLight text-white rounded-xl font-bold transition-colors">
+                                    <button type="submit" class="w-1/3 bg-primary hover:bg-primaryLight text-white rounded-xl font-bold transition-colors shadow-sm">
                                         Simpan
                                     </button>
                                 </div>
@@ -799,7 +902,7 @@
                                 <i class="fa-solid fa-circle-info mt-0.5 text-blue-500"></i>
                                 <div>
                                     <p class="font-bold mb-1">Catatan Penting</p>
-                                    <p class="text-xs text-blue-700 leading-relaxed">Perubahan ini <b>tidak akan mengubah</b> data tamu yang sudah tersimpan sebelumnya. Ini hanya berlaku untuk pencatatan buku tamu baru mulai saat ini ke depan.</p>
+                                    <p class="text-xs text-blue-700 leading-relaxed">Perubahan ini <b>tidak akan mengubah</b> data tamu yang sudah tersimpan sebelumnya. Ini hanya berlaku untuk pencatatan buku tamu baru mulai saat ini ke depan. Navigasi Rekap Data dan SPMB akan otomatis mengikuti periode aktif ini.</p>
                                 </div>
                             </div>
                         </form>
@@ -865,15 +968,38 @@
         </nav>
     </div>
 
-
     <!-- ========================================== -->
     <!-- MODALS -->
     <!-- ========================================== -->
 
+    <!-- Date Range Picker Custom Modal -->
+    <div id="dateRangeModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-fade-up border border-gray-100 p-6">
+            <h3 class="font-bold text-gray-800 mb-5 flex items-center gap-2">
+                <i class="fa-regular fa-calendar-check text-primary"></i> Pilih Rentang Tanggal
+            </h3>
+            <input type="hidden" id="drTarget">
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Dari Tanggal</label>
+                    <input type="date" id="drStart" class="modern-input bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Sampai Tanggal</label>
+                    <input type="date" id="drEnd" class="modern-input bg-gray-50">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeModal('dateRangeModal')" class="border border-gray-200 bg-white text-gray-600 font-bold px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm">Batal</button>
+                <button onclick="applyDateRange()" class="bg-primary hover:bg-primaryLight text-white font-bold px-5 py-2.5 rounded-xl shadow-sm transition-colors text-sm">Terapkan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Login Modal -->
     <div id="loginModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-fade-up relative border border-gray-100">
-            <button onclick="closeModal('loginModal')" class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors"><i class="fa-solid fa-times"></i></button>
+            <button onclick="closeModal('loginModal')" class="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             
             <div class="p-8">
                 <div class="text-center mb-8">
@@ -935,7 +1061,7 @@
                     <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-600 flex items-center justify-center"><i class="fa-solid fa-address-card"></i></div>
                     Detail Kunjungan
                 </h3>
-                <button onclick="closeModal('detailModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-times"></i></button>
+                <button onclick="closeModal('detailModal')" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
             <div class="p-5 md:p-8 overflow-y-auto bg-gray-50/30" id="detailContentContainer">
@@ -953,7 +1079,7 @@
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-fade-up border border-gray-100">
             <div class="flex justify-between items-center p-6 border-b border-gray-50">
                 <h3 id="spmbModalTitle" class="text-lg font-bold text-gray-800">Tambah Tahun Pelajaran SPMB</h3>
-                <button onclick="closeModal('spmbModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-700 hover:bg-gray-200"><i class="fa-solid fa-times"></i></button>
+                <button onclick="closeModal('spmbModal')" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6">
                 <form id="spmbForm" onsubmit="saveMasterSPMB(event)" class="space-y-4">
@@ -996,7 +1122,7 @@
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-fade-up border border-gray-100 max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center p-6 border-b border-gray-50 shrink-0">
                 <h3 id="akunModalTitle" class="text-lg font-bold text-gray-800">Tambah Akun Baru</h3>
-                <button onclick="closeModal('akunModal')" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-gray-700 hover:bg-gray-200"><i class="fa-solid fa-times"></i></button>
+                <button onclick="closeModal('akunModal')" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 overflow-y-auto">
                 <form id="akunForm" onsubmit="saveMasterAkun(event)" class="space-y-4">
@@ -1081,9 +1207,13 @@
         let masterAkun = [];
         let bukuTamu = [];
         let filteredData = []; 
-        let filteredSpmbData = []; // Khusus menu SPMB
+        let filteredSpmbData = [];
         let chartInstance = null;
         let activeAdmin = null;
+        
+        // State Date Range Filter
+        let rekapDateRange = { start: '', end: '' };
+        let spmbDateRange = { start: '', end: '' };
 
         // ==========================================
         // 2. UTILITIES & UI HELPERS
@@ -1149,7 +1279,6 @@
             populatePublicSPMBDropdown();
             startLiveClock();
             
-            // Setup Admin Session Check
             checkAdminSession();
         }
 
@@ -1197,9 +1326,9 @@
             const instansiList = ["SDIT Al Hikmah", "Pribadi", "SDN Karawang 1", "Dinas Pendidikan", "Pribadi", "PT XYZ", "TK ABA 1", "PAUD Mentari"];
             
             const now = new Date();
-            for(let i=0; i<30; i++) { // Increase dummy to ensure enough SPMB
+            for(let i=0; i<30; i++) { 
                 const date = new Date(now.getTime() - Math.floor(Math.random() * 15) * 24 * 60 * 60 * 1000 - Math.random() * 8 * 60 * 60 * 1000);
-                const type = Math.random() > 0.4 ? "SPMB" : "Umum"; // Slightly favor SPMB for demo
+                const type = Math.random() > 0.4 ? "SPMB" : "Umum"; 
                 
                 let entry = {
                     id: `BT${i.toString().padStart(3,'0')}_${Date.now().toString().slice(-4)}`,
@@ -1209,7 +1338,7 @@
                     nama: names[i % names.length] || "Pengunjung " + i,
                     whatsapp: `0812${Math.floor(Math.random() * 100000000)}`,
                     jenisTamu: type,
-                    instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: ""
+                    instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: "", jenisKelamin: ""
                 };
 
                 if(type === "Umum") {
@@ -1217,6 +1346,7 @@
                     entry.keperluan = "Konsultasi administrasi dan keliling melihat sarana prasarana.";
                 } else {
                     entry.namaCalonSiswa = `Calon ${entry.nama.split(' ')[0]}`;
+                    entry.jenisKelamin = Math.random() > 0.5 ? "Laki-laki" : "Perempuan";
                     entry.tempatLahir = Math.random() > 0.5 ? "Karawang" : "Bekasi";
                     entry.tanggalLahir = `201${Math.floor(Math.random()*4+4)}-0${Math.floor(Math.random()*8+1)}-1${Math.floor(Math.random()*8+1)}`;
                     entry.asalSekolah = instansiList[Math.floor(Math.random() * (instansiList.length))];
@@ -1241,7 +1371,7 @@
             getEl('formSPMB').classList.add('hidden-section');
             
             const reqUmum = ['guestInstansi', 'guestKeperluan'];
-            const reqSpmb = ['spmbTahun', 'spmbNamaSiswa', 'spmbTempatLahir', 'spmbTanggalLahir', 'spmbAsalSekolah', 'spmbAlamat'];
+            const reqSpmb = ['spmbTahun', 'spmbNamaSiswa', 'spmbJenisKelamin', 'spmbTempatLahir', 'spmbTanggalLahir', 'spmbAsalSekolah', 'spmbAlamat'];
             reqUmum.forEach(id => getEl(id).required = false);
             reqSpmb.forEach(id => getEl(id).required = false);
 
@@ -1286,7 +1416,7 @@
                 nama: getEl('guestName').value.trim(),
                 whatsapp: getEl('guestWA').value.trim(),
                 jenisTamu: type,
-                instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: ""
+                instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: "", jenisKelamin: ""
             };
 
             if(type === 'Umum') {
@@ -1295,6 +1425,7 @@
             } else {
                 payload.tahunPelajaranSPMB = getEl('spmbTahun').value;
                 payload.namaCalonSiswa = getEl('spmbNamaSiswa').value.trim();
+                payload.jenisKelamin = getEl('spmbJenisKelamin').value;
                 payload.tempatLahir = getEl('spmbTempatLahir').value.trim();
                 payload.tanggalLahir = getEl('spmbTanggalLahir').value;
                 payload.asalSekolah = getEl('spmbAsalSekolah').value.trim();
@@ -1409,13 +1540,12 @@
                 getEl('profileUsername').innerText = activeAdmin.username;
                 getEl('profileInitials').innerText = activeAdmin.nama.substring(0, 2).toUpperCase();
 
-                // RBAC (Role Based Access Control)
+                // RBAC
                 const isManajemen = activeAdmin.role === 'Manajemen';
                 getEl('menu-masterAkun').style.display = isManajemen ? 'none' : 'flex';
                 getEl('qa-masterAkun').style.display = isManajemen ? 'none' : 'flex';
                 getEl('btnResetDemo').style.display = isManajemen ? 'none' : 'flex';
                 
-                // Mobile Nav specific handling
                 if(isManajemen) {
                     getEl('mobnav-masterAkun').innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
                     getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('profile')");
@@ -1435,51 +1565,101 @@
         }
 
         function switchAdminMenu(menuId) {
-            // Hide all content
             document.querySelectorAll('.admin-content').forEach(el => el.classList.add('hidden-section'));
-            // Reset nav buttons
+            
+            // Set styles globally for sidebar hover/active based on new requirements
             document.querySelectorAll('.admin-menu-btn').forEach(el => {
+                if(el.id === 'btnResetDemo' || el.innerText.includes('Keluar')) return; // Skip actions
                 el.classList.remove('bg-pastelGreen', 'text-primary', 'font-bold');
-                el.classList.add('text-gray-500', 'font-medium');
+                el.classList.add('text-gray-500', 'font-medium', 'hover:bg-pastelGreen', 'hover:text-primary');
             });
-            // Reset mobile nav
             document.querySelectorAll('#mobileBottomNav button').forEach(el => {
-                el.classList.remove('text-primary');
+                el.classList.remove('text-primary', 'font-bold', 'bg-pastelGreen/30', 'rounded-xl');
                 el.classList.add('text-gray-400');
             });
 
-            // Show active content
             getEl(`content-${menuId}`).classList.remove('hidden-section');
             
-            // Highlight sidebar button
             const btn = getEl(`menu-${menuId}`);
             if(btn) {
                 btn.classList.add('bg-pastelGreen', 'text-primary', 'font-bold');
-                btn.classList.remove('text-gray-500', 'font-medium');
+                btn.classList.remove('text-gray-500', 'font-medium', 'hover:bg-pastelGreen', 'hover:text-primary');
             }
 
-            // Highlight mobile button (fuzzy matching for Profile vs MasterAkun based on role)
             let mobBtnId = menuId;
             if(menuId === 'profile' && activeAdmin?.role === 'Manajemen') mobBtnId = 'masterAkun'; 
             const mobBtn = getEl(`mobnav-${mobBtnId}`);
             if(mobBtn) {
-                mobBtn.classList.add('text-primary');
+                mobBtn.classList.add('text-primary', 'font-bold', 'bg-pastelGreen/30', 'rounded-xl');
                 mobBtn.classList.remove('text-gray-400');
             }
 
-            // Mobile auto-close sidebar
             if(window.innerWidth < 768) {
                 getEl('sidebar').classList.add('sidebar-mobile-hidden');
                 getEl('mobileSidebarOverlay').classList.add('hidden');
             }
 
-            // Load specific data
             if(menuId === 'dashboard') loadDashboard();
             if(menuId === 'rekap') initRekapFilters();
             if(menuId === 'dataSPMB') initDataSPMBFilters();
             if(menuId === 'settingsSPMB') renderTableMasterSPMB();
             if(menuId === 'masterAkun') renderTableMasterAkun();
         }
+
+        // ==========================================
+        // 5.5 CUSTOM DATE RANGE LOGIC
+        // ==========================================
+        function openDateRangeModal(target) {
+            getEl('drTarget').value = target;
+            if (target === 'rekap') {
+                getEl('drStart').value = rekapDateRange.start;
+                getEl('drEnd').value = rekapDateRange.end;
+            } else {
+                getEl('drStart').value = spmbDateRange.start;
+                getEl('drEnd').value = spmbDateRange.end;
+            }
+            openModal('dateRangeModal');
+        }
+
+        function applyDateRange() {
+            const target = getEl('drTarget').value;
+            const s = getEl('drStart').value;
+            const e = getEl('drEnd').value;
+
+            if (s && e && new Date(s) > new Date(e)) {
+                Swal.fire('Rentang tanggal tidak valid', 'Tanggal mulai tidak boleh lebih besar dari tanggal akhir.', 'error');
+                return;
+            }
+
+            if (target === 'rekap') {
+                rekapDateRange = { start: s, end: e };
+                updateDateRangeText('textRentangRekap', rekapDateRange);
+                filterData();
+            } else {
+                spmbDateRange = { start: s, end: e };
+                updateDateRangeText('textRentangSPMB', spmbDateRange);
+                filterDataSPMB();
+            }
+            closeModal('dateRangeModal');
+        }
+
+        function updateDateRangeText(elId, rangeObj) {
+            const el = getEl(elId);
+            if (!rangeObj.start && !rangeObj.end) {
+                el.innerText = 'Semua Tanggal';
+                return;
+            }
+            
+            const formatDateStr = (dStr) => {
+                const d = new Date(dStr);
+                return `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+            };
+
+            if (rangeObj.start && rangeObj.end) el.innerText = `${formatDateStr(rangeObj.start)} - ${formatDateStr(rangeObj.end)}`;
+            else if (rangeObj.start) el.innerText = `Sejak ${formatDateStr(rangeObj.start)}`;
+            else el.innerText = `Hingga ${formatDateStr(rangeObj.end)}`;
+        }
+
 
         // ==========================================
         // 6. DASHBOARD & STATS
@@ -1543,7 +1723,7 @@
                 const badge = m.status === 'Aktif' ? '<span class="w-2 h-2 rounded-full bg-green-500"></span>' : '<span class="w-2 h-2 rounded-full bg-gray-300"></span>';
                 const statusTxt = m.linkWhatsApp ? `<span class="text-xs text-green-600"><i class="fa-brands fa-whatsapp"></i> Grup Aktif</span>` : `<span class="text-xs text-orange-500">Grup Belum Tersedia</span>`;
                 list.innerHTML += `
-                    <li class="py-3 px-4 flex items-center justify-between">
+                    <li class="py-3 px-4 flex items-center justify-between hover:bg-gray-50 transition-colors rounded-lg">
                         <div class="flex items-center gap-3">
                             ${badge}
                             <span class="font-bold text-gray-700 text-sm">SPMB ${m.tahun}</span>
@@ -1555,25 +1735,14 @@
         }
 
         // ==========================================
-        // 7. DATA KHUSUS SPMB LOGIC (NEW)
+        // 7. DATA KHUSUS SPMB LOGIC
         // ==========================================
         function initDataSPMBFilters() {
-            // Filter dropdown populator
-            const selTahunBuku = getEl('filterSpmbTahunBuku');
-            const thnBukuTamuSet = new Set(bukuTamu.map(b => b.tahunPelajaranBukuTamu));
-            thnBukuTamuSet.add(SYSTEM_CONFIG.tahunPelajaranBukuTamu);
-            selTahunBuku.innerHTML = '<option value="Semua">Semua Periode</option>';
-            Array.from(thnBukuTamuSet).sort().reverse().forEach(t => {
-                const selected = t === SYSTEM_CONFIG.tahunPelajaranBukuTamu ? 'selected' : '';
-                selTahunBuku.innerHTML += `<option value="${t}" ${selected}>${t}</option>`;
-            });
-
             const selTahunTarget = getEl('filterSpmbTahunTarget');
             selTahunTarget.innerHTML = '<option value="Semua">Semua Tahun</option>';
             masterSPMB.forEach(m => {
                 selTahunTarget.innerHTML += `<option value="${m.tahun}">${m.tahun}</option>`;
             });
-
             filterDataSPMB();
         }
 
@@ -1581,8 +1750,9 @@
             getEl('filterSpmbNama').value = '';
             getEl('filterSpmbSekolah').value = '';
             getEl('filterSpmbTahunTarget').value = 'Semua';
-            getEl('filterSpmbTahunBuku').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
-            getEl('filterSpmbWaktu').value = 'Semua';
+            getEl('filterSpmbJenisKelamin').value = 'Semua';
+            spmbDateRange = { start: '', end: '' };
+            updateDateRangeText('textRentangSPMB', spmbDateRange);
             filterDataSPMB();
         }
 
@@ -1590,28 +1760,26 @@
             const searchNama = getEl('filterSpmbNama').value.toLowerCase();
             const searchSekolah = getEl('filterSpmbSekolah').value.toLowerCase();
             const thnTarget = getEl('filterSpmbTahunTarget').value;
-            const thnBuku = getEl('filterSpmbTahunBuku').value;
-            const waktu = getEl('filterSpmbWaktu').value;
+            const jenisKelamin = getEl('filterSpmbJenisKelamin').value;
 
-            // Only filter guests that are SPMB type
-            let result = bukuTamu.filter(b => b.jenisTamu === 'SPMB');
+            // 1. Ambil data Buku Tamu. 2. Filter Active Period. 3. Filter JenisTamu = SPMB
+            let result = bukuTamu.filter(b => b.tahunPelajaranBukuTamu === SYSTEM_CONFIG.tahunPelajaranBukuTamu && b.jenisTamu === 'SPMB');
 
-            if(thnBuku !== 'Semua') result = result.filter(b => b.tahunPelajaranBukuTamu === thnBuku);
+            // 4. Nama 5. Sekolah 6. Tahun 7. Jenis Kelamin
             if(thnTarget !== 'Semua') result = result.filter(b => b.tahunPelajaranSPMB === thnTarget);
-
-            if(waktu !== 'Semua') {
-                const todayStr = new Date().toISOString().split('T')[0];
-                const now = new Date();
-                if(waktu === 'Hari Ini') result = result.filter(b => b._rawDate.startsWith(todayStr));
-                else if(waktu === '7 Hari') {
-                    const last7 = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
-                    result = result.filter(b => new Date(b._rawDate) >= last7);
-                }
-                else if(waktu === 'Bulan Ini') result = result.filter(b => b._rawDate.startsWith(now.toISOString().substring(0, 7)));
-            }
-
+            if(jenisKelamin !== 'Semua') result = result.filter(b => (b.jenisKelamin || '') === jenisKelamin);
             if(searchNama) result = result.filter(b => b.namaCalonSiswa.toLowerCase().includes(searchNama));
             if(searchSekolah) result = result.filter(b => b.asalSekolah.toLowerCase().includes(searchSekolah));
+
+            // 8. Rentang Tanggal
+            if (spmbDateRange.start) {
+                const sd = new Date(spmbDateRange.start); sd.setHours(0,0,0,0);
+                result = result.filter(b => new Date(b._rawDate) >= sd);
+            }
+            if (spmbDateRange.end) {
+                const ed = new Date(spmbDateRange.end); ed.setHours(23,59,59,999);
+                result = result.filter(b => new Date(b._rawDate) <= ed);
+            }
 
             filteredSpmbData = result;
             updateSpmbStats();
@@ -1626,6 +1794,9 @@
             
             const sekolahSet = new Set(filteredSpmbData.map(b => b.asalSekolah.trim().toLowerCase()).filter(s => s));
             getEl('spmbStatSekolah').innerText = sekolahSet.size;
+
+            getEl('spmbStatLaki').innerText = filteredSpmbData.filter(b => (b.jenisKelamin || '') === 'Laki-laki').length;
+            getEl('spmbStatPerempuan').innerText = filteredSpmbData.filter(b => (b.jenisKelamin || '') === 'Perempuan').length;
         }
 
         function renderTableDataSPMB() {
@@ -1640,6 +1811,10 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50/80 transition-colors';
                 
+                const jk = b.jenisKelamin || '-';
+                const jkBadge = jk === 'Laki-laki' ? `<span class="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded text-[10px] font-bold shadow-sm"><i class="fa-solid fa-person"></i> L</span>` : 
+                                jk === 'Perempuan' ? `<span class="bg-pink-50 text-pink-600 border border-pink-100 px-2 py-0.5 rounded text-[10px] font-bold shadow-sm"><i class="fa-solid fa-person-dress"></i> P</span>` : '-';
+
                 tr.innerHTML = `
                     <td class="p-4 text-center text-gray-400 font-medium">${i + 1}</td>
                     <td class="p-4 whitespace-nowrap">
@@ -1650,6 +1825,7 @@
                         <div class="font-bold text-gray-800">${b.namaCalonSiswa}</div>
                         <div class="text-xs text-gray-500 font-medium mt-0.5">${b.tempatLahir}, ${b.tanggalLahir}</div>
                     </td>
+                    <td class="p-4">${jkBadge}</td>
                     <td class="p-4">
                         <span class="bg-orange-100 text-orange-700 text-xs px-2.5 py-1 rounded-md font-bold">${b.tahunPelajaranSPMB}</span>
                     </td>
@@ -1673,63 +1849,60 @@
         // 8. REKAP DATA & FILTERING (GLOBAL)
         // ==========================================
         function initRekapFilters() {
-            const thnBukuTamuSet = new Set(bukuTamu.map(b => b.tahunPelajaranBukuTamu));
-            thnBukuTamuSet.add(SYSTEM_CONFIG.tahunPelajaranBukuTamu); 
-            
-            const selBuku = getEl('filterTahunBuku');
-            selBuku.innerHTML = '<option value="Semua">Semua Periode</option>';
-            Array.from(thnBukuTamuSet).sort().reverse().forEach(t => {
-                const selected = t === SYSTEM_CONFIG.tahunPelajaranBukuTamu ? 'selected' : '';
-                selBuku.innerHTML += `<option value="${t}" ${selected}>${t}</option>`;
-            });
-
             const selSpmb = getEl('optgroupSPMB');
             selSpmb.innerHTML = '';
             masterSPMB.forEach(m => { selSpmb.innerHTML += `<option value="SPMB_${m.tahun}">SPMB ${m.tahun}</option>`; });
-
             filterData(); 
         }
 
         function resetFilters() {
             getEl('filterSearch').value = '';
-            getEl('filterTahunBuku').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
             getEl('filterJenisSPMB').value = 'Semua';
-            getEl('filterWaktu').value = 'Semua';
+            rekapDateRange = { start: '', end: '' };
+            updateDateRangeText('textRentangRekap', rekapDateRange);
             filterData();
         }
 
         function filterData() {
             const search = getEl('filterSearch').value.toLowerCase();
-            const tahunBuku = getEl('filterTahunBuku').value;
             const jenisSpmb = getEl('filterJenisSPMB').value;
-            const waktu = getEl('filterWaktu').value;
 
-            let result = bukuTamu;
-            if(tahunBuku !== 'Semua') result = result.filter(b => b.tahunPelajaranBukuTamu === tahunBuku);
+            // 1 & 2. Ambil data Buku Tamu dan batasi dengan Periode Aktif
+            let result = bukuTamu.filter(b => b.tahunPelajaranBukuTamu === SYSTEM_CONFIG.tahunPelajaranBukuTamu);
 
+            // 3. Jenis Tamu
             if(jenisSpmb === 'Umum') result = result.filter(b => b.jenisTamu === 'Umum');
             else if(jenisSpmb.startsWith('SPMB_')) {
                 const tSpmb = jenisSpmb.replace('SPMB_', '');
                 result = result.filter(b => b.jenisTamu === 'SPMB' && b.tahunPelajaranSPMB === tSpmb);
             }
 
-            if(waktu !== 'Semua') {
-                const todayStr = new Date().toISOString().split('T')[0];
-                const now = new Date();
-                if(waktu === 'Hari Ini') result = result.filter(b => b._rawDate.startsWith(todayStr));
-                else if(waktu === '7 Hari') {
-                    const last7 = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
-                    result = result.filter(b => new Date(b._rawDate) >= last7);
-                }
-                else if(waktu === 'Bulan Ini') result = result.filter(b => b._rawDate.startsWith(now.toISOString().substring(0, 7)));
+            // 4. Rentang Tanggal
+            if (rekapDateRange.start) {
+                const sd = new Date(rekapDateRange.start); sd.setHours(0,0,0,0);
+                result = result.filter(b => new Date(b._rawDate) >= sd);
+            }
+            if (rekapDateRange.end) {
+                const ed = new Date(rekapDateRange.end); ed.setHours(23,59,59,999);
+                result = result.filter(b => new Date(b._rawDate) <= ed);
             }
 
+            // 5. Search
             if(search) {
                 result = result.filter(b => b.nama.toLowerCase().includes(search) || b.whatsapp.includes(search) || b.namaCalonSiswa.toLowerCase().includes(search) || b.asalSekolah.toLowerCase().includes(search));
             }
 
             filteredData = result;
+            updateRekapStats();
             renderTableRekap();
+        }
+
+        function updateRekapStats() {
+            getEl('rekapStatTotal').innerText = filteredData.length;
+            getEl('rekapStatUmum').innerText = filteredData.filter(b => b.jenisTamu === 'Umum').length;
+            getEl('rekapStatSPMB').innerText = filteredData.filter(b => b.jenisTamu === 'SPMB').length;
+            const todayStr = new Date().toISOString().split('T')[0];
+            getEl('rekapStatToday').innerText = filteredData.filter(b => b._rawDate.startsWith(todayStr)).length;
         }
 
         function renderTableRekap() {
@@ -1744,7 +1917,7 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50/80 transition-colors';
                 const isSpmb = b.jenisTamu === 'SPMB';
-                const jenisBadge = isSpmb ? `<span class="bg-orange-100 text-orange-700 text-xs px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-user-graduate mr-1"></i> SPMB</span>` : `<span class="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-md font-bold"><i class="fa-solid fa-building-user mr-1"></i> Umum</span>`;
+                const jenisBadge = isSpmb ? `<span class="bg-orange-100 text-orange-700 text-xs px-2.5 py-1 rounded-md font-bold shadow-sm"><i class="fa-solid fa-user-graduate mr-1"></i> SPMB</span>` : `<span class="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-md font-bold shadow-sm"><i class="fa-solid fa-building-user mr-1"></i> Umum</span>`;
                 
                 tr.innerHTML = `
                     <td class="p-4 text-center text-gray-400 font-medium">${i + 1}</td>
@@ -1783,7 +1956,7 @@
 
             // Section 1: Informasi Kunjungan (Common for both)
             html += `
-                <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
+                <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden transition-all hover:shadow-md">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-gray-50 rounded-bl-full -mr-4 -mt-4 opacity-50 pointer-events-none"></div>
                     
                     <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide border-b border-gray-100 pb-2">
@@ -1823,7 +1996,7 @@
             // Section 2: Specific Data Based on Type
             if(b.jenisTamu === 'SPMB') {
                 html += `
-                    <div class="bg-pastelOrange/30 p-5 rounded-2xl shadow-sm border border-orange-100 relative overflow-hidden">
+                    <div class="bg-pastelOrange/30 p-5 rounded-2xl shadow-sm border border-orange-100 relative overflow-hidden transition-all hover:shadow-md">
                         <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide border-b border-orange-200/50 pb-2">
                             <i class="fa-solid fa-child-reaching text-orange-500"></i> Data Calon Siswa (SPMB)
                         </h4>
@@ -1837,12 +2010,12 @@
                                 <span class="font-bold text-gray-800 text-base">${b.namaCalonSiswa}</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Tempat Lahir</span>
-                                <span class="font-medium text-gray-800">${b.tempatLahir}</span>
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Jenis Kelamin</span>
+                                <span class="font-medium text-gray-800">${b.jenisKelamin || '-'}</span>
                             </div>
                             <div>
-                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Tanggal Lahir</span>
-                                <span class="font-medium text-gray-800">${b.tanggalLahir}</span>
+                                <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Tempat, Tanggal Lahir</span>
+                                <span class="font-medium text-gray-800">${b.tempatLahir}, ${b.tanggalLahir}</span>
                             </div>
                             <div class="md:col-span-2">
                                 <span class="block text-[10px] font-bold text-gray-400 mb-1 tracking-widest uppercase">Asal Sekolah</span>
@@ -1857,7 +2030,7 @@
                 `;
             } else {
                  html += `
-                    <div class="bg-pastelBlue/40 p-5 rounded-2xl shadow-sm border border-blue-100 relative overflow-hidden">
+                    <div class="bg-pastelBlue/40 p-5 rounded-2xl shadow-sm border border-blue-100 relative overflow-hidden transition-all hover:shadow-md">
                         <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide border-b border-blue-200/50 pb-2">
                             <i class="fa-solid fa-briefcase text-blue-500"></i> Detail Keperluan Umum
                         </h4>
@@ -1886,7 +2059,7 @@
                 'No': i + 1, 'ID': b.id, 'Waktu Kunjungan': b.timestamp, 'Thn Buku Tamu': b.tahunPelajaranBukuTamu,
                 'Nama Pengunjung': b.nama, 'WhatsApp': b.whatsapp, 'Jenis Tamu': b.jenisTamu,
                 'Instansi (Umum)': b.instansi || '-', 'Keperluan (Umum)': b.keperluan || '-',
-                'Thn SPMB (SPMB)': b.tahunPelajaranSPMB || '-', 'Nama Calon Siswa (SPMB)': b.namaCalonSiswa || '-',
+                'Thn SPMB (SPMB)': b.tahunPelajaranSPMB || '-', 'Nama Calon Siswa (SPMB)': b.namaCalonSiswa || '-', 'Jenis Kelamin (SPMB)': b.jenisKelamin || '-',
                 'TTL Calon Siswa (SPMB)': (b.tempatLahir && b.tanggalLahir) ? `${b.tempatLahir}, ${b.tanggalLahir}` : '-',
                 'Asal Sekolah (SPMB)': b.asalSekolah || '-', 'Alamat (SPMB)': b.alamat || '-'
             }));
@@ -1902,7 +2075,9 @@
             doc.setFontSize(12); doc.setFont("helvetica", "bold");
             doc.text("REKAP BUKU TAMU GLOBAL - SMPIT MENTARI ILMU", 14, 15);
             doc.setFontSize(9); doc.setFont("helvetica", "normal");
-            doc.text(`Periode Cetak: ${SYSTEM_CONFIG.tahunPelajaranBukuTamu} | Dicetak: ${formatTgl(new Date().toISOString())}`, 14, 21);
+            
+            const rangeText = (rekapDateRange.start || rekapDateRange.end) ? getEl('textRentangRekap').innerText : 'Semua';
+            doc.text(`Periode Cetak: ${SYSTEM_CONFIG.tahunPelajaranBukuTamu} | Rentang: ${rangeText} | Dicetak: ${formatTgl(new Date().toISOString())}`, 14, 21);
 
             const tableData = filteredData.map((b, i) => [
                 i + 1, b.timestamp.split(' ')[0], b.nama, b.whatsapp, b.jenisTamu,
@@ -1920,11 +2095,10 @@
         function exportExcelSPMB() {
             if(filteredSpmbData.length === 0) return Swal.fire('Kosong', 'Tidak ada data SPMB untuk diekspor.', 'info');
             const exportData = filteredSpmbData.map((b, i) => ({
-                'No': i + 1, 'ID': b.id, 'Waktu Kunjungan': b.timestamp,
-                'Tahun Diminati': b.tahunPelajaranSPMB, 'Tahun Buku Tamu': b.tahunPelajaranBukuTamu,
-                'Nama Calon Siswa': b.namaCalonSiswa, 'Tempat Lahir': b.tempatLahir, 'Tanggal Lahir': b.tanggalLahir,
-                'Asal Sekolah': b.asalSekolah, 'Alamat Lengkap': b.alamat,
-                'Nama Pendamping/Ortu': b.nama, 'WhatsApp Kontak': b.whatsapp
+                'No': i + 1, 'Waktu Kunjungan': b.timestamp,
+                'Nama Calon Siswa': b.namaCalonSiswa, 'Jenis Kelamin': b.jenisKelamin || '-', 
+                'Tahun Diminati': b.tahunPelajaranSPMB, 'Tempat, Tanggal Lahir': `${b.tempatLahir}, ${b.tanggalLahir}`,
+                'Asal Sekolah': b.asalSekolah, 'Nama Pengunjung': b.nama, 'WhatsApp': b.whatsapp, 'Alamat Lengkap': b.alamat
             }));
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
@@ -1938,16 +2112,18 @@
             doc.setFontSize(12); doc.setFont("helvetica", "bold");
             doc.text("DATA KUNJUNGAN CALON SISWA SPMB - SMPIT MENTARI ILMU", 14, 15);
             doc.setFontSize(9); doc.setFont("helvetica", "normal");
-            doc.text(`Total Data: ${filteredSpmbData.length} | Dicetak: ${formatTgl(new Date().toISOString())}`, 14, 21);
+            
+            const rangeText = (spmbDateRange.start || spmbDateRange.end) ? getEl('textRentangSPMB').innerText : 'Semua';
+            doc.text(`Periode: ${SYSTEM_CONFIG.tahunPelajaranBukuTamu} | Rentang: ${rangeText} | Total Data: ${filteredSpmbData.length}`, 14, 21);
 
             const tableData = filteredSpmbData.map((b, i) => [
-                i + 1, b.timestamp.split(' ')[0], b.tahunPelajaranSPMB, b.namaCalonSiswa, 
+                i + 1, b.timestamp.split(' ')[0], b.tahunPelajaranSPMB, b.namaCalonSiswa, b.jenisKelamin || '-',
                 `${b.tempatLahir}, ${b.tanggalLahir}`, b.asalSekolah, b.nama, b.whatsapp
             ]);
             doc.autoTable({
-                head: [['No', 'Tanggal', 'Thn Diminati', 'Nama Calon Siswa', 'Tempat & Tgl Lahir', 'Asal Sekolah', 'Pendamping', 'WhatsApp']],
+                head: [['No', 'Tanggal', 'Thn Diminati', 'Nama Calon Siswa', 'JK', 'Tempat & Tgl Lahir', 'Asal Sekolah', 'Pendamping', 'WhatsApp']],
                 body: tableData, startY: 26, theme: 'grid',
-                styles: { fontSize: 8, cellPadding: 2 }, headStyles: { fillColor: [234, 88, 12] } // Orange theme for SPMB
+                styles: { fontSize: 8, cellPadding: 2 }, headStyles: { fillColor: [234, 88, 12] } 
             });
             doc.save(`Data_SPMB_${new Date().getTime()}.pdf`);
         }
@@ -1971,8 +2147,8 @@
                     <td class="p-4 text-sm text-blue-600 truncate max-w-[200px]">${m.linkWhatsApp ? `<a href="${m.linkWhatsApp}" target="_blank" class="hover:underline font-medium"><i class="fa-brands fa-whatsapp"></i> Link Tersedia</a>` : '<span class="text-gray-400 text-xs italic">Kosong</span>'}</td>
                     <td class="p-4 text-sm text-gray-600 font-medium">${m.nomorAdmin}<br><div class="mt-1">${statusBadge}</div></td>
                     <td class="p-4 text-center whitespace-nowrap">
-                        <button onclick='editMasterSPMB(${JSON.stringify(m)})' class="text-gray-500 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 w-8 h-8 rounded-lg transition-colors mr-1" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>
-                        <button onclick="deleteMasterSPMB('${m.id}', '${m.tahun}')" class="text-gray-500 hover:text-red-600 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 w-8 h-8 rounded-lg transition-colors" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button>
+                        <button onclick='editMasterSPMB(${JSON.stringify(m)})' class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors border border-blue-100 inline-flex items-center justify-center mr-1" title="Edit"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="deleteMasterSPMB('${m.id}', '${m.tahun}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors border border-red-100 inline-flex items-center justify-center" title="Hapus"><i class="fa-solid fa-trash text-xs"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -2056,8 +2232,8 @@
                     </td>
                     <td class="p-4">${statusBadge}</td>
                     <td class="p-4 text-center whitespace-nowrap">
-                        <button onclick='editAkun(${JSON.stringify(m)})' class="text-gray-500 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-200 w-8 h-8 rounded-lg transition-colors mr-1" title="Edit Akun"><i class="fa-solid fa-pen text-xs"></i></button>
-                        <button onclick="deleteAkun('${m.id}', '${m.username}')" class="text-gray-500 hover:text-red-600 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 w-8 h-8 rounded-lg transition-colors" title="Hapus Akun"><i class="fa-solid fa-trash text-xs"></i></button>
+                        <button onclick='editAkun(${JSON.stringify(m)})' class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors border border-blue-100 inline-flex items-center justify-center mr-1" title="Edit Akun"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="deleteAkun('${m.id}', '${m.username}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors border border-red-100 inline-flex items-center justify-center" title="Hapus Akun"><i class="fa-solid fa-trash text-xs"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -2095,7 +2271,6 @@
             const uName = getEl('setAkunUsername').value.trim();
             const pwd = getEl('setAkunPassword').value;
 
-            // Check username duplicate
             const isDup = masterAkun.some(a => a.username === uName && a.id !== id);
             if(isDup) { Swal.fire('Username Terpakai', 'Silakan gunakan username lain.', 'error'); return; }
 
@@ -2106,7 +2281,7 @@
                     masterAkun[idx].username = uName;
                     masterAkun[idx].role = getEl('setAkunRole').value;
                     masterAkun[idx].status = getEl('setAkunStatus').value;
-                    if(pwd) masterAkun[idx].password = pwd; // update if provided
+                    if(pwd) masterAkun[idx].password = pwd; 
                 }
                 Swal.fire({icon:'success', title:'Akun Diperbarui', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
             } else {
@@ -2151,6 +2326,11 @@
             getEl('headerAdminTahunBukuTamu').innerText = val;
             
             Swal.fire({icon:'success', title:'Tersimpan', text:`Periode Buku Tamu aktif diubah menjadi ${val}.`, confirmButtonColor: '#2A5245'});
+            
+            // Refresh data views to match new active period
+            if(!getEl('content-rekap').classList.contains('hidden-section')) filterData();
+            if(!getEl('content-dataSPMB').classList.contains('hidden-section')) filterDataSPMB();
+            if(!getEl('content-dashboard').classList.contains('hidden-section')) loadDashboard();
         }
 
         function resetDemoData() {
@@ -2162,7 +2342,6 @@
                 if (result.isConfirmed) {
                     Object.values(LS_KEYS).forEach(k => localStorage.removeItem(k));
                     
-                    // Re-init full system
                     initApp(); 
                     if(activeAdmin) switchAdminMenu('dashboard');
                     Swal.fire({title: 'Berhasil', text: 'Sistem telah dikembalikan ke kondisi Demo awal.', icon: 'success', confirmButtonColor: '#2A5245'});
