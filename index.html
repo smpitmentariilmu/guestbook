@@ -34,7 +34,7 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: '#1D3B31', // Deep green from reference
+                        primary: '#1D3B31',
                         primaryLight: '#2A5245',
                         primaryDark: '#12261F',
                         accent: '#EAB308',
@@ -59,7 +59,6 @@
         }
     </script>
 
-    <!-- Custom CSS -->
     <style>
         body {
             background-color: #F4F7F6;
@@ -129,33 +128,25 @@
         @media (max-width: 768px) { 
             .sidebar-mobile-hidden { transform: translateX(-100%); } 
             #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 16rem !important; }
-            .sidebar-collapsed .menu-text { display: block; } /* Disable collapse logic on mobile */
+            .sidebar-collapsed .menu-text { display: block; }
             .sidebar-collapsed .admin-menu-btn { justify-content: flex-start; padding-left: 1rem; padding-right: 1rem; }
             .sidebar-collapsed .admin-menu-btn i { margin-right: 0.75rem !important; }
-            #admin-main-content { padding-bottom: 5rem; } /* Space for bottom nav */
+            #admin-main-content { padding-bottom: 5rem; }
         }
 
-        /* Safe area for mobile bottom nav */
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
             .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         }
 
-        /* Chart container */
         .chart-container { position: relative; height: 300px; width: 100%; }
-
-        /* Animation */
         .animate-fade-up { animation: fadeUp 0.5s ease-out forwards; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col selection:bg-primaryLight selection:text-white">
 
-    <!-- ========================================== -->
-    <!-- PUBLIC VIEW: GUEST BOOK FORM -->
-    <!-- ========================================== -->
+    <!-- PUBLIC VIEW -->
     <div id="public-view" class="view-container flex-grow flex flex-col h-full overflow-y-auto bg-[#F4F7F6]">
-        
-        <!-- Minimalist Header -->
         <header class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
             <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -174,20 +165,14 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="flex-grow flex flex-col items-center justify-start p-4 md:py-10">
-            
-            <!-- Welcome Section -->
             <div class="w-full max-w-3xl text-center mb-8 animate-fade-up">
                 <h2 class="text-3xl md:text-4xl font-extrabold text-primary mb-3 tracking-tight">Selamat Datang 👋</h2>
                 <p class="text-gray-500 text-sm md:text-base max-w-lg mx-auto">Silakan catat kunjungan Anda melalui Buku Tamu Digital ini untuk memudahkan kami menyambut kedatangan Anda.</p>
             </div>
 
-            <!-- Main Card -->
             <div class="bg-white rounded-[2rem] shadow-card w-full max-w-3xl overflow-hidden border border-gray-50 p-6 md:p-10 animate-fade-up" style="animation-delay: 0.1s;">
                 <form id="guestForm" onsubmit="submitBukuTamu(event)">
-                    
-                    <!-- Section 1: Basic Info -->
                     <div class="mb-10">
                         <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
                             <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-600 flex items-center justify-center"><i class="fa-solid fa-address-card"></i></div>
@@ -205,11 +190,9 @@
                         </div>
                     </div>
 
-                    <!-- Section 2: Type Selection -->
                     <div class="mb-10">
                         <label class="block text-sm font-semibold text-gray-700 mb-3">Tujuan Kunjungan <span class="text-red-500">*</span></label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Card Umum -->
                             <div onclick="selectGuestType('Umum')" id="cardUmum" class="type-card rounded-2xl p-5 flex items-start gap-4">
                                 <i class="fa-solid fa-circle-check check-icon text-xl"></i>
                                 <div class="icon-box w-12 h-12 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-xl shrink-0 transition-colors"><i class="fa-solid fa-building-user"></i></div>
@@ -218,7 +201,6 @@
                                     <p class="text-xs text-gray-500 leading-relaxed">Kunjungan umum dan keperluan administrasi sekolah.</p>
                                 </div>
                             </div>
-                            <!-- Card SPMB -->
                             <div onclick="selectGuestType('SPMB')" id="cardSPMB" class="type-card rounded-2xl p-5 flex items-start gap-4">
                                 <i class="fa-solid fa-circle-check check-icon text-xl"></i>
                                 <div class="icon-box w-12 h-12 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-xl shrink-0 transition-colors"><i class="fa-solid fa-user-graduate"></i></div>
@@ -231,7 +213,6 @@
                         <input type="hidden" id="guestType" required>
                     </div>
 
-                    <!-- Section 3A: Tamu Umum Fields -->
                     <div id="formUmum" class="hidden-section mb-10 animate-fade-up bg-gray-50 p-6 rounded-2xl border border-gray-100">
                         <div class="flex items-center gap-3 mb-5">
                             <div class="w-8 h-8 rounded-lg bg-pastelOrange text-orange-600 flex items-center justify-center"><i class="fa-solid fa-briefcase"></i></div>
@@ -249,7 +230,6 @@
                         </div>
                     </div>
 
-                    <!-- Section 3B: Tamu SPMB Fields -->
                     <div id="formSPMB" class="hidden-section mb-10 animate-fade-up bg-pastelGreen/50 p-6 rounded-2xl border border-green-100">
                         <div class="flex items-center gap-3 mb-5">
                             <div class="w-8 h-8 rounded-lg bg-green-100 text-green-700 flex items-center justify-center"><i class="fa-solid fa-child-reaching"></i></div>
@@ -258,9 +238,7 @@
                         <div class="space-y-5">
                             <div class="md:w-1/2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-1.5">Tahun Pelajaran Diminati <span class="text-red-500">*</span></label>
-                                <select id="spmbTahun" class="modern-input bg-white font-bold text-primary cursor-pointer">
-                                    <!-- Populated dynamically -->
-                                </select>
+                                <select id="spmbTahun" class="modern-input bg-white font-bold text-primary cursor-pointer"></select>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
@@ -297,7 +275,6 @@
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
                     <button type="submit" id="btnSubmitForm" class="w-full bg-primary hover:bg-primaryLight text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3 text-lg">
                         <span>Simpan Kunjungan</span>
                         <i class="fa-solid fa-arrow-right"></i>
@@ -305,7 +282,6 @@
                 </form>
             </div>
             
-            <!-- Footer -->
             <footer class="mt-12 text-center text-sm text-gray-400">
                 &copy; 2026 SMPIT Mentari Ilmu Karawang <br> 
                 <span class="text-xs">Digital Guest Book System</span>
@@ -313,12 +289,9 @@
         </main>
     </div>
 
-    <!-- ========================================== -->
-    <!-- ADMIN VIEW: EXECUTIVE DASHBOARD            -->
-    <!-- ========================================== -->
+    <!-- ADMIN VIEW -->
     <div id="admin-view" class="view-container hidden-section h-full flex flex-col md:flex-row bg-[#F4F7F6]">
         
-        <!-- Mobile Header & Overlay -->
         <div class="md:hidden bg-primary text-white p-4 flex justify-between items-center shadow-md z-30 sticky top-0">
             <div class="flex items-center gap-2">
                 <img src="https://mentariilmu.org/logo.png" alt="Logo" class="w-8 h-8 object-contain bg-white rounded-md p-0.5">
@@ -328,9 +301,7 @@
         </div>
         <div id="mobileSidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity"></div>
 
-        <!-- Sidebar -->
         <aside id="sidebar" class="sidebar-transition sidebar-mobile-hidden fixed md:relative z-30 w-64 h-full bg-white shadow-card flex flex-col border-r border-gray-100 overflow-y-auto">
-            <!-- Sidebar Header -->
             <div class="p-5 border-b border-gray-50 flex items-center justify-between sticky top-0 bg-white z-10">
                 <div class="flex items-center gap-3 overflow-hidden">
                     <img src="https://mentariilmu.org/logo.png" alt="Logo" class="w-10 h-10 object-contain shrink-0 drop-shadow-sm">
@@ -341,7 +312,6 @@
                 </div>
             </div>
             
-            <!-- Navigation -->
             <nav class="flex-grow p-3 space-y-1">
                 <p class="menu-group-title px-3 pt-4 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Utama</p>
                 <button onclick="switchAdminMenu('dashboard')" id="menu-dashboard" data-tooltip="Dashboard" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl text-gray-500 hover:bg-pastelGreen hover:text-primary transition-all font-medium">
@@ -371,7 +341,6 @@
                 </button>
             </nav>
 
-            <!-- Bottom Actions -->
             <div class="p-3 border-t border-gray-50 space-y-1">
                 <button onclick="logoutAdmin()" data-tooltip="Logout" class="admin-menu-btn w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-all font-bold">
                     <i class="fa-solid fa-arrow-right-from-bracket w-6 text-center text-lg"></i> <span class="menu-text text-sm">Keluar Aplikasi</span>
@@ -379,10 +348,7 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
         <main id="admin-main-content" class="flex-grow overflow-y-auto flex flex-col relative w-full overflow-x-hidden">
-            
-            <!-- Dashboard Top Header (Desktop) -->
             <header class="hidden md:flex justify-between items-center p-6 bg-[#F4F7F6] sticky top-0 z-20 backdrop-blur-sm bg-opacity-90">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleSidebarDesktop()" class="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:text-primary transition-colors flex items-center justify-center">
@@ -414,8 +380,6 @@
                 
                 <!-- SECTION: DASHBOARD -->
                 <div id="content-dashboard" class="admin-content animate-fade-up">
-                    
-                    <!-- Hero Banner -->
                     <div class="bg-primary rounded-3xl p-6 md:p-8 text-white relative overflow-hidden shadow-card mb-6">
                         <div class="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 rounded-full bg-white opacity-5"></div>
                         <div class="absolute bottom-0 right-20 -mb-10 w-32 h-32 rounded-full bg-white opacity-10"></div>
@@ -430,7 +394,6 @@
                         </div>
                     </div>
 
-                    <!-- Quick Access -->
                     <div class="mb-6">
                         <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3 px-1">Akses Cepat</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -454,16 +417,13 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Stats Grid (REDESIGNED based on reference) -->
                         <div class="lg:col-span-2 space-y-6">
                             <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider px-1">Ringkasan Statistik</h3>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                                     <div class="flex justify-between items-start mb-4">
                                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Total Tamu</span>
-                                        <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-500 flex items-center justify-center text-lg shrink-0">
-                                            <i class="fa-solid fa-users"></i>
-                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-users"></i></div>
                                     </div>
                                     <div>
                                         <h4 class="text-3xl font-extrabold text-gray-800" id="statTotal">0</h4>
@@ -473,9 +433,7 @@
                                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                                     <div class="flex justify-between items-start mb-4">
                                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Hari Ini</span>
-                                        <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-500 flex items-center justify-center text-lg shrink-0">
-                                            <i class="fa-solid fa-calendar-day"></i>
-                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-calendar-day"></i></div>
                                     </div>
                                     <div>
                                         <h4 class="text-3xl font-extrabold text-gray-800" id="statToday">0</h4>
@@ -485,9 +443,7 @@
                                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                                     <div class="flex justify-between items-start mb-4">
                                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu Umum</span>
-                                        <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-lg shrink-0">
-                                            <i class="fa-solid fa-building-user"></i>
-                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-building-user"></i></div>
                                     </div>
                                     <div>
                                         <h4 class="text-3xl font-extrabold text-gray-800" id="statUmum">0</h4>
@@ -497,9 +453,7 @@
                                 <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                                     <div class="flex justify-between items-start mb-4">
                                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu SPMB</span>
-                                        <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-500 flex items-center justify-center text-lg shrink-0">
-                                            <i class="fa-solid fa-user-graduate"></i>
-                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-graduate"></i></div>
                                     </div>
                                     <div>
                                         <h4 class="text-3xl font-extrabold text-gray-800" id="statSPMB">0</h4>
@@ -519,15 +473,13 @@
                         <div class="space-y-6">
                             <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider px-1">Informasi SPMB</h3>
                             <div class="bg-white rounded-2xl shadow-card border border-gray-100 p-1">
-                                <ul id="dashboardSpmbInfoList" class="divide-y divide-gray-50">
-                                    <!-- Populated dynamically -->
-                                </ul>
+                                <ul id="dashboardSpmbInfoList" class="divide-y divide-gray-50"></ul>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION: DATA SPMB (NEW) -->
+                <!-- SECTION: DATA SPMB -->
                 <div id="content-dataSPMB" class="admin-content hidden-section animate-fade-up">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
@@ -544,66 +496,44 @@
                         </div>
                     </div>
 
-                    <!-- Summary Cards SPMB (REDESIGNED) -->
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                         <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md col-span-2 md:col-span-1">
                             <div class="flex justify-between items-start mb-3">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Total Calon Siswa</span>
-                                <div class="w-8 h-8 rounded-lg bg-pastelOrange text-orange-500 flex items-center justify-center text-sm shrink-0">
-                                    <i class="fa-solid fa-users"></i>
-                                </div>
+                                <div class="w-8 h-8 rounded-lg bg-pastelOrange text-orange-500 flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-users"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatTotal">0</h4>
-                            </div>
+                            <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatTotal">0</h4>
                         </div>
                         <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-3">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Hari Ini</span>
-                                <div class="w-8 h-8 rounded-lg bg-pastelGreen text-green-500 flex items-center justify-center text-sm shrink-0">
-                                    <i class="fa-solid fa-calendar-check"></i>
-                                </div>
+                                <div class="w-8 h-8 rounded-lg bg-pastelGreen text-green-500 flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-calendar-check"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatToday">0</h4>
-                            </div>
+                            <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatToday">0</h4>
                         </div>
                         <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-3">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Sekolah Asal</span>
-                                <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-500 flex items-center justify-center text-sm shrink-0">
-                                    <i class="fa-solid fa-school"></i>
-                                </div>
+                                <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-500 flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-school"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatSekolah">0</h4>
-                            </div>
+                            <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatSekolah">0</h4>
                         </div>
                         <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-3">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Laki-laki</span>
-                                <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-500 flex items-center justify-center text-sm shrink-0">
-                                    <i class="fa-solid fa-person"></i>
-                                </div>
+                                <div class="w-8 h-8 rounded-lg bg-pastelBlue text-blue-500 flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-person"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatLaki">0</h4>
-                            </div>
+                            <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatLaki">0</h4>
                         </div>
                         <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-3">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Perempuan</span>
-                                <div class="w-8 h-8 rounded-lg bg-pastelPink text-pink-500 flex items-center justify-center text-sm shrink-0">
-                                    <i class="fa-solid fa-person-dress"></i>
-                                </div>
+                                <div class="w-8 h-8 rounded-lg bg-pastelPink text-pink-500 flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-person-dress"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatPerempuan">0</h4>
-                            </div>
+                            <h4 class="text-2xl font-extrabold text-gray-800" id="spmbStatPerempuan">0</h4>
                         </div>
                     </div>
 
-                    <!-- Filters Card SPMB -->
                     <div class="bg-white p-5 rounded-2xl shadow-card border border-gray-100 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div class="md:col-span-1">
@@ -624,7 +554,6 @@
                                 <label class="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Tahun Diminati</label>
                                 <select id="filterSpmbTahunTarget" onchange="filterDataSPMB()" class="modern-input !py-2 !text-sm cursor-pointer">
                                     <option value="Semua">Semua Tahun</option>
-                                    <!-- Populated by JS -->
                                 </select>
                             </div>
                             <div>
@@ -647,7 +576,6 @@
                         </div>
                     </div>
 
-                    <!-- Table Card SPMB -->
                     <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse whitespace-nowrap">
@@ -663,9 +591,7 @@
                                         <th class="p-4 font-bold text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tableBodyDataSPMB" class="text-sm divide-y divide-gray-50">
-                                    <!-- Populated by JS -->
-                                </tbody>
+                                <tbody id="tableBodyDataSPMB" class="text-sm divide-y divide-gray-50"></tbody>
                             </table>
                         </div>
                         <div id="tableEmptyStateSPMB" class="hidden-section p-16 text-center text-gray-400">
@@ -675,7 +601,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION: REKAP BUKU TAMU (UMUM & SPMB) -->
+                <!-- SECTION: REKAP BUKU TAMU -->
                 <div id="content-rekap" class="admin-content hidden-section animate-fade-up">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <div>
@@ -692,59 +618,37 @@
                         </div>
                     </div>
 
-                    <!-- Summary Cards Rekap Kunjungan (NEWLY ADDED) -->
                     <div id="rekapSummaryContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-4">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Total Kunjungan</span>
-                                <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-500 flex items-center justify-center text-lg shrink-0">
-                                    <i class="fa-solid fa-users"></i>
-                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-pastelBlue text-blue-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-users"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatTotal">0</h4>
-                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Berdasarkan filter</p>
-                            </div>
+                            <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatTotal">0</h4>
                         </div>
                         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-4">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu Umum</span>
-                                <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-lg shrink-0">
-                                    <i class="fa-solid fa-building-user"></i>
-                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-building-user"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatUmum">0</h4>
-                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Berdasarkan filter</p>
-                            </div>
+                            <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatUmum">0</h4>
                         </div>
                         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-4">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Tamu SPMB</span>
-                                <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-500 flex items-center justify-center text-lg shrink-0">
-                                    <i class="fa-solid fa-user-graduate"></i>
-                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-graduate"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatSPMB">0</h4>
-                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Berdasarkan filter</p>
-                            </div>
+                            <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatSPMB">0</h4>
                         </div>
                         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md">
                             <div class="flex justify-between items-start mb-4">
                                 <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight w-2/3">Hari Ini</span>
-                                <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-500 flex items-center justify-center text-lg shrink-0">
-                                    <i class="fa-solid fa-calendar-day"></i>
-                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-calendar-day"></i></div>
                             </div>
-                            <div>
-                                <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatToday">0</h4>
-                                <p class="text-[10px] text-gray-400 mt-1 font-medium">Masuk hari ini</p>
-                            </div>
+                            <h4 class="text-3xl font-extrabold text-gray-800" id="rekapStatToday">0</h4>
                         </div>
                     </div>
 
-                    <!-- Filters Card -->
                     <div class="bg-white p-5 rounded-2xl shadow-card border border-gray-100 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div class="md:col-span-1">
@@ -774,7 +678,6 @@
                         </div>
                     </div>
 
-                    <!-- Table Card -->
                     <div class="bg-white rounded-2xl shadow-card border border-gray-100 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse whitespace-nowrap">
@@ -788,9 +691,7 @@
                                         <th class="p-4 font-bold text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tableBodyRekap" class="text-sm divide-y divide-gray-50">
-                                    <!-- Populated by JS -->
-                                </tbody>
+                                <tbody id="tableBodyRekap" class="text-sm divide-y divide-gray-50"></tbody>
                             </table>
                         </div>
                         <div id="tableEmptyState" class="hidden-section p-16 text-center text-gray-400">
@@ -824,9 +725,7 @@
                                         <th class="p-4 font-bold text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tableBodySPMB" class="text-sm divide-y divide-gray-50">
-                                    <!-- Populated by JS -->
-                                </tbody>
+                                <tbody id="tableBodySPMB" class="text-sm divide-y divide-gray-50"></tbody>
                             </table>
                         </div>
                     </div>
@@ -856,9 +755,7 @@
                                         <th class="p-4 font-bold text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tableBodyAkun" class="text-sm divide-y divide-gray-50">
-                                    <!-- Populated by JS -->
-                                </tbody>
+                                <tbody id="tableBodyAkun" class="text-sm divide-y divide-gray-50"></tbody>
                             </table>
                         </div>
                     </div>
@@ -915,9 +812,7 @@
 
                     <div class="bg-white rounded-2xl shadow-card border border-gray-100 p-6 max-w-2xl">
                         <div class="flex items-center gap-6 mb-8 border-b border-gray-100 pb-8">
-                            <div class="w-24 h-24 bg-primary text-white rounded-2xl flex items-center justify-center text-4xl shadow-inner font-bold" id="profileInitials">
-                                AD
-                            </div>
+                            <div class="w-24 h-24 bg-primary text-white rounded-2xl flex items-center justify-center text-4xl shadow-inner font-bold" id="profileInitials">AD</div>
                             <div>
                                 <h3 class="text-2xl font-extrabold text-gray-800 mb-1" id="profileName">Nama Admin</h3>
                                 <span class="bg-pastelBlue text-blue-700 border border-blue-200 text-xs px-3 py-1 rounded-full font-bold inline-block" id="profileRole">Role</span>
@@ -940,7 +835,6 @@
             </div>
         </main>
 
-        <!-- Mobile Bottom Navigation (Only visible < 768px) -->
         <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] rounded-t-3xl z-40 flex justify-around items-center p-2 pb-safe border-t border-gray-100">
             <button onclick="switchAdminMenu('dashboard')" id="mobnav-dashboard" class="flex flex-col items-center gap-1 p-2 flex-1 text-gray-400 hover:text-primary transition-colors">
                 <i class="fa-solid fa-house text-xl mb-1"></i>
@@ -965,11 +859,7 @@
         </nav>
     </div>
 
-    <!-- ========================================== -->
     <!-- MODALS -->
-    <!-- ========================================== -->
-
-    <!-- Date Range Picker Custom Modal -->
     <div id="dateRangeModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-fade-up border border-gray-100 p-6">
             <h3 class="font-bold text-gray-800 mb-5 flex items-center gap-2">
@@ -993,7 +883,7 @@
         </div>
     </div>
 
-    <!-- Login Modal -->
+    <!-- Login Modal (Diperbaiki flow loadingnya) -->
     <div id="loginModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-fade-up relative border border-gray-100">
             <button onclick="closeModal('loginModal')" class="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
@@ -1023,30 +913,24 @@
                             </button>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-primary hover:bg-primaryLight text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg mt-4 flex items-center justify-center gap-2">
-                        Masuk Dashboard <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <button type="submit" id="btnLoginSubmit" class="w-full bg-primary hover:bg-primaryLight text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg mt-4 flex items-center justify-center gap-2">
+                        <span>Masuk Dashboard</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     </button>
                 </form>      
             </div>
         </div>
     </div>
 
-    <!-- Success Modal -->
     <div id="successModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 text-center animate-fade-up border border-gray-100">
             <div id="successIcon" class="text-6xl mb-5 drop-shadow-md">🎉</div>
             <h3 id="successTitle" class="text-2xl font-extrabold text-gray-800 mb-3">TERIMA KASIH</h3>
-            <div id="successMessage" class="text-gray-500 text-sm md:text-base mb-8 space-y-2 leading-relaxed">
-                <!-- Dynamic content -->
-            </div>
-            <div id="successActionContainer" class="mb-4">
-                <!-- Dynamic button -->
-            </div>
+            <div id="successMessage" class="text-gray-500 text-sm md:text-base mb-8 space-y-2 leading-relaxed"></div>
+            <div id="successActionContainer" class="mb-4"></div>
             <button onclick="closeSuccessModal()" class="w-full bg-gray-100 text-gray-700 font-bold py-3.5 px-4 rounded-xl hover:bg-gray-200 transition-colors">SELESAI</button>
         </div>
     </div>
 
-    <!-- Detail Guest Modal (Admin) - REDESIGNED -->
     <div id="detailModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-2xl w-full max-w-xl overflow-hidden animate-fade-up flex flex-col max-h-[95vh] border border-gray-100">
             <div class="flex justify-between items-center p-5 md:p-6 border-b border-gray-100 shrink-0 bg-white sticky top-0 z-10">
@@ -1057,9 +941,7 @@
                 <button onclick="closeModal('detailModal')" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <div class="p-5 md:p-8 overflow-y-auto bg-gray-50/30" id="detailContentContainer">
-                <!-- Injected dynamically by JS -->
-            </div>
+            <div class="p-5 md:p-8 overflow-y-auto bg-gray-50/30" id="detailContentContainer"></div>
             
             <div class="bg-white p-5 border-t border-gray-100 text-right shrink-0">
                 <button onclick="closeModal('detailModal')" class="bg-white border border-gray-200 shadow-sm text-gray-700 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-colors">Tutup Detail</button>
@@ -1067,7 +949,6 @@
         </div>
     </div>
 
-    <!-- Form SPMB Setting Modal -->
     <div id="spmbModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-fade-up border border-gray-100">
             <div class="flex justify-between items-center p-6 border-b border-gray-50">
@@ -1110,7 +991,6 @@
         </div>
     </div>
 
-    <!-- Master Akun Setting Modal -->
     <div id="akunModal" class="fixed inset-0 modal-overlay hidden-section z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden animate-fade-up border border-gray-100 max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center p-6 border-b border-gray-50 shrink-0">
@@ -1163,61 +1043,42 @@
         </div>
     </div>
 
-
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT LOGIC                           -->
-    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykQuoEAfOl7h0zVPzXe8Ko5wblSeM3dKW-zyfiRqgKXXtN7zagsbxU4P0zyJcUCmWFQA/exec'; // PASTI GANTI DENGAN URL WEB APP ANDA
 
-        // ============================================================
-        // GOOGLE APPS SCRIPT API
-        // ============================================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykQuoEAfOl7h0zVPzXe8Ko5wblSeM3dKW-zyfiRqgKXXtN7zagsbxU4P0zyJcUCmWFQA/exec';
-
+        // API Request Handler (Diperbaiki Error Handlingnya)
         async function apiRequest(action, data = {}) {
             if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'MASUKKAN_URL_WEB_APP_DI_SINI') {
-                throw new Error('APPS_SCRIPT_URL belum dikonfigurasi.');
+                throw new Error('APPS_SCRIPT_URL belum dikonfigurasi pada file HTML.');
             }
 
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action, ...data })
-            });
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action, ...data })
+                });
 
-            const result = await response.json();
-            if (result.status !== 'success') {
-                throw new Error(result.message || 'Terjadi kesalahan pada server.');
+                const text = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.error('Response server bukan JSON:', text);
+                    throw new Error('Server Apps Script gagal merespons dengan JSON (biasanya karena belum di-deploy dengan benar atau URL salah).');
+                }
+
+                if (result.status !== 'success') {
+                    throw new Error(result.message || 'Terjadi kesalahan pada server.');
+                }
+                return result;
+            } catch (err) {
+                throw err;
             }
-            return result;
         }
 
-        // ==========================================
-        // 1. DATA CONSTANTS & DEFAULTS
-        // ==========================================
-        const LS_KEYS = {
-            BUKU_TAMU: 'smpit_buku_tamu_v3',
-            MASTER_SPMB: 'smpit_master_spmb_v3',
-            SYSTEM_CONFIG: 'smpit_sys_config_v3',
-            MASTER_AKUN: 'smpit_master_akun_v3',
-            ADMIN_SESSION: 'smpit_admin_session_v3'
-        };
-
-        const defaultSystemConfig = {
-            namaSekolah: "SMPIT Mentari Ilmu Karawang",
-            judul: "Buku Tamu",
-            tahunPelajaranBukuTamu: "2026/2027"
-        };
-
-        const defaultMasterSPMB = [
-            { id: "SPMB001", tahun: "2028/2029", linkWhatsApp: "https://chat.whatsapp.com/CONTOH-2028", nomorAdmin: "6281234567890", pesanSPMB: "Silakan bergabung dengan Grup WhatsApp SPMB.", status: "Aktif" },
-            { id: "SPMB002", tahun: "2029/2030", linkWhatsApp: "", nomorAdmin: "6281234567890", pesanSPMB: "Informasi grup belum tersedia.", status: "Aktif" }
-        ];
-
-        const defaultMasterAkun = [
-            { id: "USR001", nama: "Admin Manajemen", username: "admin", password: "admin123", role: "Admin", status: "Aktif" },
-            { id: "USR002", nama: "Manajemen Sekolah", username: "manajemen", password: "123456", role: "Manajemen", status: "Aktif" }
-        ];
+        const LS_KEYS = { ADMIN_SESSION: 'smpit_admin_session_v3' };
 
         let SYSTEM_CONFIG = {};
         let masterSPMB = [];
@@ -1228,13 +1089,9 @@
         let chartInstance = null;
         let activeAdmin = null;
         
-        // State Date Range Filter
         let rekapDateRange = { start: '', end: '' };
         let spmbDateRange = { start: '', end: '' };
 
-        // ==========================================
-        // 2. UTILITIES & UI HELPERS
-        // ==========================================
         const getEl = id => document.getElementById(id);
         const formatTgl = dStr => {
             if(!dStr) return "-";
@@ -1242,7 +1099,6 @@
             const pad = n => n.toString().padStart(2, '0');
             return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         };
-        const generateId = prefix => prefix + Date.now().toString(36).toUpperCase();
 
         function togglePasswordVisibility(inputId, iconId) {
             const input = getEl(inputId);
@@ -1282,157 +1138,47 @@
         }
 
         // ==========================================
-        // 3. SYSTEM INIT & DATA LOADERS
+        // SINGLE INIT APP FLOW
         // ==========================================
+        async function initApp() {
+            try {
+                // Selalu tarik data awal
+                const result = await apiRequest('getInitData');
+                SYSTEM_CONFIG = result.systemConfig || {};
+                masterSPMB = result.masterSPMB || [];
 
-async function initApp() {
-    try {
-        const result = await apiRequest('getInitData');
-
-        SYSTEM_CONFIG = result.systemConfig || {...defaultSystemConfig};
-        masterSPMB = result.masterSPMB || [];
-
-        getEl('headerTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
-        getEl('headerAdminTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
-
-        if (getEl('sysConfigTahunAktif')) {
-            getEl('sysConfigTahunAktif').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
-        }
-
-        populatePublicSPMBDropdown();
-        startLiveClock();
-        checkAdminSession();
-    } catch (err) {
-        console.error(err);
-        Swal.fire({
-            icon: 'error',
-            title: 'Koneksi Database Gagal',
-            text: err.message || 'Tidak dapat terhubung ke Google Apps Script.',
-            confirmButtonColor: '#2A5245'
-        });
-    }
-}
-
-async function loadAdminData() {
-    if (!activeAdmin?.token) return;
-
-    const result = await apiRequest('getAdminData', { token: activeAdmin.token });
-
-    SYSTEM_CONFIG = result.systemConfig || {};
-    masterSPMB = result.masterSPMB || [];
-    masterAkun = result.masterAkun || [];
-    bukuTamu = result.bukuTamu || [];
-
-    if (getEl('sysConfigTahunAktif')) {
-        getEl('sysConfigTahunAktif').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
-    }
-
-    getEl('headerTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
-    getEl('headerAdminTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
-    populatePublicSPMBDropdown();
-}
-
-async function loadSystemConfig() {
-    const result = await apiRequest('getInitData');
-    SYSTEM_CONFIG = result.systemConfig || {...defaultSystemConfig};
-}
-
-async function loadMasterSPMB() {
-    const result = await apiRequest('getInitData');
-    masterSPMB = result.masterSPMB || [];
-}
-
-async function loadMasterAkun() {
-    if (!activeAdmin?.token) return;
-    const result = await apiRequest('getAdminData', { token: activeAdmin.token });
-    masterAkun = result.masterAkun || [];
-}
-
-async function loadBukuTamuData() {
-    if (!activeAdmin?.token) return;
-    const result = await apiRequest('getAdminData', { token: activeAdmin.token });
-    bukuTamu = result.bukuTamu || [];
-}
-
-        function loadSystemConfig() {
-            const saved = localStorage.getItem(LS_KEYS.SYSTEM_CONFIG);
-            if(saved) SYSTEM_CONFIG = JSON.parse(saved);
-            else {
-                SYSTEM_CONFIG = {...defaultSystemConfig};
-                localStorage.setItem(LS_KEYS.SYSTEM_CONFIG, JSON.stringify(SYSTEM_CONFIG));
-            }
-            if(getEl('sysConfigTahunAktif')) getEl('sysConfigTahunAktif').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
-        }
-
-        function loadMasterSPMB() {
-            const saved = localStorage.getItem(LS_KEYS.MASTER_SPMB);
-            if(saved) masterSPMB = JSON.parse(saved);
-            else {
-                masterSPMB = [...defaultMasterSPMB];
-                localStorage.setItem(LS_KEYS.MASTER_SPMB, JSON.stringify(masterSPMB));
-            }
-        }
-
-        function loadMasterAkun() {
-            const saved = localStorage.getItem(LS_KEYS.MASTER_AKUN);
-            if(saved) masterAkun = JSON.parse(saved);
-            else {
-                masterAkun = [...defaultMasterAkun];
-                localStorage.setItem(LS_KEYS.MASTER_AKUN, JSON.stringify(masterAkun));
-            }
-        }
-
-        function loadBukuTamuData() {
-            const saved = localStorage.getItem(LS_KEYS.BUKU_TAMU);
-            if(saved) {
-                bukuTamu = JSON.parse(saved);
-            } else {
-                bukuTamu = generateDummyData();
-                localStorage.setItem(LS_KEYS.BUKU_TAMU, JSON.stringify(bukuTamu));
-            }
-        }
-
-        function generateDummyData() {
-            const dummy = [];
-            const names = ["Ahmad Fauzi", "Siti Aminah", "Budi Santoso", "Rina Marlina", "Andi Irawan", "Dewi Lestari", "Hendra Gunawan", "Maya Sari", "Fajar Sidiq", "Nita Kurnia", "Reza Pratama", "Dian Sastro", "Eko Yuli", "Fitriani", "Agus Setiawan", "Rizal Fahmi"];
-            const instansiList = ["SDIT Al Hikmah", "Pribadi", "SDN Karawang 1", "Dinas Pendidikan", "Pribadi", "PT XYZ", "TK ABA 1", "PAUD Mentari"];
-            
-            const now = new Date();
-            for(let i=0; i<30; i++) { 
-                const date = new Date(now.getTime() - Math.floor(Math.random() * 15) * 24 * 60 * 60 * 1000 - Math.random() * 8 * 60 * 60 * 1000);
-                const type = Math.random() > 0.4 ? "SPMB" : "Umum"; 
-                
-                let entry = {
-                    id: `BT${i.toString().padStart(3,'0')}_${Date.now().toString().slice(-4)}`,
-                    timestamp: formatTgl(date.toISOString()), 
-                    _rawDate: date.toISOString(), 
-                    tahunPelajaranBukuTamu: "2026/2027",
-                    nama: names[i % names.length] || "Pengunjung " + i,
-                    whatsapp: `0812${Math.floor(Math.random() * 100000000)}`,
-                    jenisTamu: type,
-                    instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: "", jenisKelamin: ""
-                };
-
-                if(type === "Umum") {
-                    entry.instansi = instansiList[Math.floor(Math.random() * instansiList.length)];
-                    entry.keperluan = "Konsultasi administrasi dan keliling melihat sarana prasarana.";
-                } else {
-                    entry.namaCalonSiswa = `Calon ${entry.nama.split(' ')[0]}`;
-                    entry.jenisKelamin = Math.random() > 0.5 ? "Laki-laki" : "Perempuan";
-                    entry.tempatLahir = Math.random() > 0.5 ? "Karawang" : "Bekasi";
-                    entry.tanggalLahir = `201${Math.floor(Math.random()*4+4)}-0${Math.floor(Math.random()*8+1)}-1${Math.floor(Math.random()*8+1)}`;
-                    entry.asalSekolah = instansiList[Math.floor(Math.random() * (instansiList.length))];
-                    entry.alamat = "Perumahan Indah Blok " + String.fromCharCode(65+Math.floor(Math.random()*5)) + " No. " + (i+1);
-                    entry.tahunPelajaranSPMB = Math.random() > 0.5 ? "2028/2029" : "2029/2030";
+                getEl('headerTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
+                getEl('headerAdminTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
+                if (getEl('sysConfigTahunAktif')) {
+                    getEl('sysConfigTahunAktif').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
                 }
-                dummy.push(entry);
+
+                populatePublicSPMBDropdown();
+                startLiveClock();
+                
+                // Periksa langsung session (jika login, akan ditarik data Admin)
+                await checkAdminSession();
+            } catch (err) {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi API Gagal',
+                    text: err.message || 'Tidak dapat terhubung ke server.',
+                    confirmButtonColor: '#2A5245'
+                });
             }
-            return dummy.sort((a,b) => new Date(b._rawDate) - new Date(a._rawDate));
         }
 
-        // ==========================================
-        // 4. PUBLIC BUKU TAMU LOGIC
-        // ==========================================
+        // Dipanggil saat login dan saat aplikasi mendeteksi ada session aktif
+        async function loadAdminData() {
+            if (!activeAdmin?.token) return;
+            const result = await apiRequest('getAdminData', { token: activeAdmin.token });
+            SYSTEM_CONFIG = result.systemConfig || {};
+            masterSPMB = result.masterSPMB || [];
+            masterAkun = result.masterAkun || [];
+            bukuTamu = result.bukuTamu || [];
+        }
+
         function selectGuestType(type) {
             getEl('guestType').value = type;
             getEl('cardUmum').classList.remove('selected');
@@ -1464,80 +1210,56 @@ async function loadBukuTamuData() {
             });
         }
 
+        async function submitBukuTamu(e) {
+            e.preventDefault();
 
-async function submitBukuTamu(e) {
-    e.preventDefault();
+            if (!getEl('guestType').value) {
+                Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap', text: 'Silakan pilih Tujuan Kunjungan terlebih dahulu.', confirmButtonColor: '#2A5245' });
+                return;
+            }
 
-    if (!getEl('guestType').value) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Data Belum Lengkap',
-            text: 'Silakan pilih Tujuan Kunjungan terlebih dahulu.',
-            confirmButtonColor: '#2A5245'
-        });
-        return;
-    }
+            const btn = getEl('btnSubmitForm');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loader"></div>';
+            btn.disabled = true;
 
-    const btn = getEl('btnSubmitForm');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<div class="loader"></div>';
-    btn.disabled = true;
+            try {
+                const type = getEl('guestType').value;
+                const payload = {
+                    tahunPelajaranBukuTamu: SYSTEM_CONFIG.tahunPelajaranBukuTamu,
+                    nama: getEl('guestName').value.trim(),
+                    whatsapp: getEl('guestWA').value.trim(),
+                    jenisTamu: type,
+                    instansi: type === 'Umum' ? getEl('guestInstansi').value.trim() : '',
+                    keperluan: type === 'Umum' ? getEl('guestKeperluan').value.trim() : '',
+                    namaCalonSiswa: type === 'SPMB' ? getEl('spmbNamaSiswa').value.trim() : '',
+                    tempatLahir: type === 'SPMB' ? getEl('spmbTempatLahir').value.trim() : '',
+                    tanggalLahir: type === 'SPMB' ? getEl('spmbTanggalLahir').value : '',
+                    asalSekolah: type === 'SPMB' ? getEl('spmbAsalSekolah').value.trim() : '',
+                    alamat: type === 'SPMB' ? getEl('spmbAlamat').value.trim() : '',
+                    tahunPelajaranSPMB: type === 'SPMB' ? getEl('spmbTahun').value : '',
+                    jenisKelamin: type === 'SPMB' ? getEl('spmbJenisKelamin').value : ''
+                };
 
-    try {
-        const type = getEl('guestType').value;
-        const payload = {
-            tahunPelajaranBukuTamu: SYSTEM_CONFIG.tahunPelajaranBukuTamu,
-            nama: getEl('guestName').value.trim(),
-            whatsapp: getEl('guestWA').value.trim(),
-            jenisTamu: type,
-            instansi: '',
-            keperluan: '',
-            namaCalonSiswa: '',
-            tempatLahir: '',
-            tanggalLahir: '',
-            asalSekolah: '',
-            alamat: '',
-            tahunPelajaranSPMB: '',
-            jenisKelamin: ''
-        };
+                const result = await apiRequest('saveGuest', { data: payload });
+                const saved = result.data || payload;
+                bukuTamu.unshift(saved);
 
-        if (type === 'Umum') {
-            payload.instansi = getEl('guestInstansi').value.trim();
-            payload.keperluan = getEl('guestKeperluan').value.trim();
-        } else {
-            payload.tahunPelajaranSPMB = getEl('spmbTahun').value;
-            payload.namaCalonSiswa = getEl('spmbNamaSiswa').value.trim();
-            payload.jenisKelamin = getEl('spmbJenisKelamin').value;
-            payload.tempatLahir = getEl('spmbTempatLahir').value.trim();
-            payload.tanggalLahir = getEl('spmbTanggalLahir').value;
-            payload.asalSekolah = getEl('spmbAsalSekolah').value.trim();
-            payload.alamat = getEl('spmbAlamat').value.trim();
+                getEl('guestForm').reset();
+                getEl('guestType').value = '';
+                getEl('cardUmum').classList.remove('selected');
+                getEl('cardSPMB').classList.remove('selected');
+                getEl('formUmum').classList.add('hidden-section');
+                getEl('formSPMB').classList.add('hidden-section');
+
+                showSuccessModal(saved);
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Gagal Menyimpan', text: err.message, confirmButtonColor: '#2A5245' });
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
-
-        const result = await apiRequest('saveGuest', { data: payload });
-        const saved = result.data || payload;
-        bukuTamu.unshift(saved);
-
-        getEl('guestForm').reset();
-        getEl('guestType').value = '';
-        getEl('cardUmum').classList.remove('selected');
-        getEl('cardSPMB').classList.remove('selected');
-        getEl('formUmum').classList.add('hidden-section');
-        getEl('formSPMB').classList.add('hidden-section');
-
-        showSuccessModal(saved);
-    } catch (err) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal Menyimpan',
-            text: err.message || 'Data kunjungan gagal disimpan.',
-            confirmButtonColor: '#2A5245'
-        });
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-}
 
         function showSuccessModal(data) {
             let config = {};
@@ -1571,9 +1293,6 @@ async function submitBukuTamu(e) {
             openModal('successModal');
         }
 
-        // ==========================================
-        // 5. AUTHENTICATION & NAVIGATION
-        // ==========================================
         function openModal(id) { 
             getEl(id).classList.remove('hidden-section'); 
             const pwdInput = getEl(id).querySelector('input[type="text"]');
@@ -1589,171 +1308,115 @@ async function submitBukuTamu(e) {
             getEl('mobileSidebarOverlay').classList.toggle('hidden');
         }
 
+        // ==========================================
+        // ADMIN AUTHENTICATION FLOW
+        // ==========================================
+        async function loginAdmin(e) {
+            e.preventDefault();
 
-async function loginAdmin(e) {
-    e.preventDefault();
+            const u = getEl('loginUsername').value.trim();
+            const p = getEl('loginPassword').value;
 
-    const u = getEl('loginUsername').value.trim();
-    const p = getEl('loginPassword').value;
+            if (!u || !p) {
+                Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap', text: 'Username dan password wajib diisi.', confirmButtonColor: '#2A5245' });
+                return;
+            }
 
-    if (!u || !p) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Data Belum Lengkap',
-            text: 'Username dan password wajib diisi.',
-            confirmButtonColor: '#2A5245'
-        });
-        return;
-    }
-
-    const btn = e.submitter || getEl('loginForm').querySelector('button[type="submit"]');
-    const originalText = btn ? btn.innerHTML : '';
-
-    try {
-        if (btn) {
+            const btn = getEl('btnLoginSubmit');
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
             btn.disabled = true;
+
+            try {
+                const result = await apiRequest('login', { username: u, password: p });
+                activeAdmin = result.user;
+                localStorage.setItem(LS_KEYS.ADMIN_SESSION, JSON.stringify(activeAdmin));
+
+                getEl('loginForm').reset();
+                closeModal('loginModal');
+
+                await loadAdminData();
+                applyAdminSessionUI(); // Langsung switch ke dashboard tanpa bounce
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Login Gagal', text: err.message || 'Username atau password tidak sesuai.', confirmButtonColor: '#2A5245' });
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
-        const result = await apiRequest('login', { username: u, password: p });
-        activeAdmin = result.user;
-        localStorage.setItem(LS_KEYS.ADMIN_SESSION, JSON.stringify(activeAdmin));
+        async function checkAdminSession() {
+            const sessionData = localStorage.getItem(LS_KEYS.ADMIN_SESSION);
 
-        getEl('loginForm').reset();
-        closeModal('loginModal');
+            if (!sessionData) {
+                activeAdmin = null;
+                getEl('admin-view').classList.add('hidden-section');
+                getEl('public-view').classList.remove('hidden-section');
+                getEl('sidebar').classList.remove('sidebar-collapsed');
+                return;
+            }
 
-        await loadAdminData();
-        applyAdminSessionUI();
-    } catch (err) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Gagal',
-            text: err.message || 'Username atau password tidak sesuai.',
-            confirmButtonColor: '#2A5245'
-        });
-    } finally {
-        if (btn) {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+            try {
+                activeAdmin = JSON.parse(sessionData);
+                if (!activeAdmin?.token) throw new Error('Sesi tidak valid.');
+
+                await loadAdminData();
+                applyAdminSessionUI();
+            } catch (err) {
+                localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
+                activeAdmin = null;
+                getEl('admin-view').classList.add('hidden-section');
+                getEl('public-view').classList.remove('hidden-section');
+            }
         }
-    }
-}
-
-function logoutAdmin() {
-    localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
-    activeAdmin = null;
-    checkAdminSession();
-}
-
-async function checkAdminSession() {
-    const sessionData = localStorage.getItem(LS_KEYS.ADMIN_SESSION);
-
-    if (!sessionData) {
-        activeAdmin = null;
-        getEl('admin-view').classList.add('hidden-section');
-        getEl('public-view').classList.remove('hidden-section');
-        getEl('sidebar').classList.remove('sidebar-collapsed');
-        return;
-    }
-
-    try {
-        activeAdmin = JSON.parse(sessionData);
-        if (!activeAdmin?.token) throw new Error('Sesi tidak valid.');
-
-        await loadAdminData();
-        applyAdminSessionUI();
-    } catch (err) {
-        localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
-        activeAdmin = null;
-        getEl('admin-view').classList.add('hidden-section');
-        getEl('public-view').classList.remove('hidden-section');
-        Swal.fire({
-            icon: 'info',
-            title: 'Sesi Berakhir',
-            text: 'Silakan login kembali.',
-            confirmButtonColor: '#2A5245'
-        });
-    }
-}
-
-function applyAdminSessionUI() {
-    getEl('adminHeaderName').innerText = activeAdmin.nama.split(' ')[0];
-    getEl('adminHeaderRole').innerText = activeAdmin.role;
-    getEl('dashHeroName').innerText = activeAdmin.nama.split(' ')[0];
-    getEl('profileName').innerText = activeAdmin.nama;
-    getEl('profileRole').innerText = activeAdmin.role;
-    getEl('profileUsername').innerText = activeAdmin.username;
-    getEl('profileInitials').innerText = activeAdmin.nama.substring(0, 2).toUpperCase();
-
-    const isManajemen = activeAdmin.role === 'Manajemen';
-    getEl('menu-masterAkun').style.display = isManajemen ? 'none' : 'flex';
-    getEl('qa-masterAkun').style.display = isManajemen ? 'none' : 'flex';
-    getEl('btnResetDemo').style.display = isManajemen ? 'none' : 'flex';
-
-    if (isManajemen) {
-        getEl('mobnav-masterAkun').innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
-        getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('profile')");
-    } else {
-        getEl('mobnav-masterAkun').innerHTML = `<i class="fa-solid fa-users-gear text-xl mb-1"></i><span class="text-[9px] font-bold text-center leading-none">Akun</span>`;
-        getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('masterAkun')");
-    }
-
-    getEl('public-view').classList.add('hidden-section');
-    getEl('admin-view').classList.remove('hidden-section');
-    switchAdminMenu('dashboard');
-}
 
         function logoutAdmin() {
             localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
             activeAdmin = null;
-            checkAdminSession();
+            getEl('admin-view').classList.add('hidden-section');
+            getEl('public-view').classList.remove('hidden-section');
+            getEl('sidebar').classList.remove('sidebar-collapsed');
         }
 
-        function checkAdminSession() {
-            const sessionData = localStorage.getItem(LS_KEYS.ADMIN_SESSION);
-            if(sessionData) {
-                activeAdmin = JSON.parse(sessionData);
-                
-                // Update Headers & Profile
-                getEl('adminHeaderName').innerText = activeAdmin.nama.split(' ')[0]; // First name
-                getEl('adminHeaderRole').innerText = activeAdmin.role;
-                getEl('dashHeroName').innerText = activeAdmin.nama.split(' ')[0];
-                
-                getEl('profileName').innerText = activeAdmin.nama;
-                getEl('profileRole').innerText = activeAdmin.role;
-                getEl('profileUsername').innerText = activeAdmin.username;
-                getEl('profileInitials').innerText = activeAdmin.nama.substring(0, 2).toUpperCase();
+        function applyAdminSessionUI() {
+            // Gunakan if(getEl) untuk menghindari error Cannot read properties of null
+            if (getEl('adminHeaderName')) getEl('adminHeaderName').innerText = activeAdmin.nama.split(' ')[0];
+            if (getEl('adminHeaderRole')) getEl('adminHeaderRole').innerText = activeAdmin.role;
+            if (getEl('dashHeroName')) getEl('dashHeroName').innerText = activeAdmin.nama.split(' ')[0];
+            if (getEl('profileName')) getEl('profileName').innerText = activeAdmin.nama;
+            if (getEl('profileRole')) getEl('profileRole').innerText = activeAdmin.role;
+            if (getEl('profileUsername')) getEl('profileUsername').innerText = activeAdmin.username;
+            if (getEl('profileInitials')) getEl('profileInitials').innerText = activeAdmin.nama.substring(0, 2).toUpperCase();
 
-                // RBAC
-                const isManajemen = activeAdmin.role === 'Manajemen';
-                getEl('menu-masterAkun').style.display = isManajemen ? 'none' : 'flex';
-                getEl('qa-masterAkun').style.display = isManajemen ? 'none' : 'flex';
-                getEl('btnResetDemo').style.display = isManajemen ? 'none' : 'flex';
-                
-                if(isManajemen) {
-                    getEl('mobnav-masterAkun').innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
-                    getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('profile')");
+            const isManajemen = activeAdmin.role === 'Manajemen';
+            
+            const menuMasterAkun = getEl('menu-masterAkun');
+            if (menuMasterAkun) menuMasterAkun.style.display = isManajemen ? 'none' : 'flex';
+            
+            const qaMasterAkun = getEl('qa-masterAkun');
+            if (qaMasterAkun) qaMasterAkun.style.display = isManajemen ? 'none' : 'flex';
+
+            const mobNavMasterAkun = getEl('mobnav-masterAkun');
+            if (mobNavMasterAkun) {
+                if (isManajemen) {
+                    mobNavMasterAkun.innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
+                    mobNavMasterAkun.setAttribute('onclick', "switchAdminMenu('profile')");
                 } else {
-                    getEl('mobnav-masterAkun').innerHTML = `<i class="fa-solid fa-users-gear text-xl mb-1"></i><span class="text-[9px] font-bold text-center leading-none">Akun</span>`;
-                    getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('masterAkun')");
+                    mobNavMasterAkun.innerHTML = `<i class="fa-solid fa-users-gear text-xl mb-1"></i><span class="text-[9px] font-bold text-center leading-none">Akun</span>`;
+                    mobNavMasterAkun.setAttribute('onclick', "switchAdminMenu('masterAkun')");
                 }
-
-                getEl('public-view').classList.add('hidden-section');
-                getEl('admin-view').classList.remove('hidden-section');
-                switchAdminMenu('dashboard');
-            } else {
-                getEl('admin-view').classList.add('hidden-section');
-                getEl('public-view').classList.remove('hidden-section');
-                getEl('sidebar').classList.remove('sidebar-collapsed');
             }
+
+            getEl('public-view').classList.add('hidden-section');
+            getEl('admin-view').classList.remove('hidden-section');
+            switchAdminMenu('dashboard');
         }
 
         function switchAdminMenu(menuId) {
             document.querySelectorAll('.admin-content').forEach(el => el.classList.add('hidden-section'));
             
-            // Set styles globally for sidebar hover/active based on new requirements
             document.querySelectorAll('.admin-menu-btn').forEach(el => {
-                if(el.id === 'btnResetDemo' || el.innerText.includes('Keluar')) return; // Skip actions
+                if(el.id === 'btnResetDemo' || el.innerText.includes('Keluar')) return;
                 el.classList.remove('bg-pastelGreen', 'text-primary', 'font-bold');
                 el.classList.add('text-gray-500', 'font-medium', 'hover:bg-pastelGreen', 'hover:text-primary');
             });
@@ -1762,7 +1425,8 @@ function applyAdminSessionUI() {
                 el.classList.add('text-gray-400');
             });
 
-            getEl(`content-${menuId}`).classList.remove('hidden-section');
+            const contentEl = getEl(`content-${menuId}`);
+            if (contentEl) contentEl.classList.remove('hidden-section');
             
             const btn = getEl(`menu-${menuId}`);
             if(btn) {
@@ -1791,7 +1455,7 @@ function applyAdminSessionUI() {
         }
 
         // ==========================================
-        // 5.5 CUSTOM DATE RANGE LOGIC
+        // CUSTOM DATE RANGE LOGIC
         // ==========================================
         function openDateRangeModal(target) {
             getEl('drTarget').value = target;
@@ -1846,7 +1510,7 @@ function applyAdminSessionUI() {
 
 
         // ==========================================
-        // 6. DASHBOARD & STATS
+        // DASHBOARD & STATS
         // ==========================================
         function loadDashboard() {
             getEl('dashPeriodeAktif').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
@@ -1919,7 +1583,7 @@ function applyAdminSessionUI() {
         }
 
         // ==========================================
-        // 7. DATA KHUSUS SPMB LOGIC
+        // DATA KHUSUS SPMB LOGIC
         // ==========================================
         function initDataSPMBFilters() {
             const selTahunTarget = getEl('filterSpmbTahunTarget');
@@ -1946,16 +1610,13 @@ function applyAdminSessionUI() {
             const thnTarget = getEl('filterSpmbTahunTarget').value;
             const jenisKelamin = getEl('filterSpmbJenisKelamin').value;
 
-            // 1. Ambil data Buku Tamu. 2. Filter Active Period. 3. Filter JenisTamu = SPMB
             let result = bukuTamu.filter(b => b.tahunPelajaranBukuTamu === SYSTEM_CONFIG.tahunPelajaranBukuTamu && b.jenisTamu === 'SPMB');
 
-            // 4. Nama 5. Sekolah 6. Tahun 7. Jenis Kelamin
             if(thnTarget !== 'Semua') result = result.filter(b => b.tahunPelajaranSPMB === thnTarget);
             if(jenisKelamin !== 'Semua') result = result.filter(b => (b.jenisKelamin || '') === jenisKelamin);
             if(searchNama) result = result.filter(b => b.namaCalonSiswa.toLowerCase().includes(searchNama));
             if(searchSekolah) result = result.filter(b => b.asalSekolah.toLowerCase().includes(searchSekolah));
 
-            // 8. Rentang Tanggal
             if (spmbDateRange.start) {
                 const sd = new Date(spmbDateRange.start); sd.setHours(0,0,0,0);
                 result = result.filter(b => new Date(b._rawDate) >= sd);
@@ -2028,9 +1689,8 @@ function applyAdminSessionUI() {
             });
         }
 
-
         // ==========================================
-        // 8. REKAP DATA & FILTERING (GLOBAL)
+        // REKAP DATA & FILTERING (GLOBAL)
         // ==========================================
         function initRekapFilters() {
             const selSpmb = getEl('optgroupSPMB');
@@ -2051,17 +1711,14 @@ function applyAdminSessionUI() {
             const search = getEl('filterSearch').value.toLowerCase();
             const jenisSpmb = getEl('filterJenisSPMB').value;
 
-            // 1 & 2. Ambil data Buku Tamu dan batasi dengan Periode Aktif
             let result = bukuTamu.filter(b => b.tahunPelajaranBukuTamu === SYSTEM_CONFIG.tahunPelajaranBukuTamu);
 
-            // 3. Jenis Tamu
             if(jenisSpmb === 'Umum') result = result.filter(b => b.jenisTamu === 'Umum');
             else if(jenisSpmb.startsWith('SPMB_')) {
                 const tSpmb = jenisSpmb.replace('SPMB_', '');
                 result = result.filter(b => b.jenisTamu === 'SPMB' && b.tahunPelajaranSPMB === tSpmb);
             }
 
-            // 4. Rentang Tanggal
             if (rekapDateRange.start) {
                 const sd = new Date(rekapDateRange.start); sd.setHours(0,0,0,0);
                 result = result.filter(b => new Date(b._rawDate) >= sd);
@@ -2071,7 +1728,6 @@ function applyAdminSessionUI() {
                 result = result.filter(b => new Date(b._rawDate) <= ed);
             }
 
-            // 5. Search
             if(search) {
                 result = result.filter(b => b.nama.toLowerCase().includes(search) || b.whatsapp.includes(search) || b.namaCalonSiswa.toLowerCase().includes(search) || b.asalSekolah.toLowerCase().includes(search));
             }
@@ -2138,11 +1794,9 @@ function applyAdminSessionUI() {
             const container = getEl('detailContentContainer');
             let html = '';
 
-            // Section 1: Informasi Kunjungan (Common for both)
             html += `
                 <div class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden transition-all hover:shadow-md">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-gray-50 rounded-bl-full -mr-4 -mt-4 opacity-50 pointer-events-none"></div>
-                    
                     <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide border-b border-gray-100 pb-2">
                         <i class="fa-solid fa-circle-info text-primary"></i> Informasi Kunjungan
                     </h4>
@@ -2177,7 +1831,6 @@ function applyAdminSessionUI() {
                 </div>
             `;
 
-            // Section 2: Specific Data Based on Type
             if(b.jenisTamu === 'SPMB') {
                 html += `
                     <div class="bg-pastelOrange/30 p-5 rounded-2xl shadow-sm border border-orange-100 relative overflow-hidden transition-all hover:shadow-md">
@@ -2236,7 +1889,7 @@ function applyAdminSessionUI() {
             openModal('detailModal');
         }
 
-        // Export Functions for Global Rekap
+        // Export Functions
         function exportExcel() {
             if(filteredData.length === 0) return Swal.fire('Kosong', 'Tidak ada data untuk diekspor.', 'info');
             const exportData = filteredData.map((b, i) => ({
@@ -2275,7 +1928,6 @@ function applyAdminSessionUI() {
             doc.save(`Rekap_Global_${new Date().getTime()}.pdf`);
         }
 
-        // Export Functions for Data SPMB Menu
         function exportExcelSPMB() {
             if(filteredSpmbData.length === 0) return Swal.fire('Kosong', 'Tidak ada data SPMB untuk diekspor.', 'info');
             const exportData = filteredSpmbData.map((b, i) => ({
@@ -2313,7 +1965,7 @@ function applyAdminSessionUI() {
         }
 
         // ==========================================
-        // 9. MASTER SPMB (CRUD)
+        // MASTER SPMB (CRUD)
         // ==========================================
         function renderTableMasterSPMB() {
             const tbody = getEl('tableBodySPMB');
@@ -2358,58 +2010,51 @@ function applyAdminSessionUI() {
             openModal('spmbModal');
         }
 
+        async function saveMasterSPMB(e) {
+            e.preventDefault();
 
-async function saveMasterSPMB(e) {
-    e.preventDefault();
+            const id = getEl('spmbId').value;
+            const data = {
+                id: id || '',
+                tahun: getEl('setSpmbTahun').value.trim(),
+                linkWhatsApp: getEl('setSpmbLink').value.trim(),
+                nomorAdmin: getEl('setSpmbAdmin').value.trim(),
+                pesanSPMB: getEl('setSpmbPesan').value.trim(),
+                status: getEl('setSpmbStatus').value
+            };
 
-    const id = getEl('spmbId').value;
-    const data = {
-        id: id || '',
-        tahun: getEl('setSpmbTahun').value.trim(),
-        linkWhatsApp: getEl('setSpmbLink').value.trim(),
-        nomorAdmin: getEl('setSpmbAdmin').value.trim(),
-        pesanSPMB: getEl('setSpmbPesan').value.trim(),
-        status: getEl('setSpmbStatus').value
-    };
-
-    try {
-        const result = await apiRequest('saveSPMB', { token: activeAdmin.token, data });
-        masterSPMB = result.masterSPMB || masterSPMB;
-        populatePublicSPMBDropdown();
-        closeModal('spmbModal');
-        renderTableMasterSPMB();
-        Swal.fire({ icon:'success', title:id ? 'Diperbarui' : 'Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500 });
-    } catch (err) {
-        Swal.fire('Gagal', err.message, 'error');
-    }
-}
-
-
-function deleteMasterSPMB(id, tahun) {
-    Swal.fire({
-        title: 'Hapus Data?',
-        text: `Yakin ingin menghapus SPMB Tahun ${tahun}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#9ca3af',
-        confirmButtonText: 'Ya, Hapus'
-    }).then(async (result) => {
-        if (!result.isConfirmed) return;
-        try {
-            const response = await apiRequest('deleteSPMB', { token: activeAdmin.token, id });
-            masterSPMB = response.masterSPMB || masterSPMB.filter(m => m.id !== id);
-            populatePublicSPMBDropdown();
-            renderTableMasterSPMB();
-            Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-        } catch (err) {
-            Swal.fire('Gagal', err.message, 'error');
+            try {
+                const result = await apiRequest('saveSPMB', { token: activeAdmin.token, data });
+                masterSPMB = result.masterSPMB || masterSPMB;
+                populatePublicSPMBDropdown();
+                closeModal('spmbModal');
+                renderTableMasterSPMB();
+                Swal.fire({ icon:'success', title:id ? 'Diperbarui' : 'Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500 });
+            } catch (err) {
+                Swal.fire('Gagal', err.message, 'error');
+            }
         }
-    });
-}
+
+        function deleteMasterSPMB(id, tahun) {
+            Swal.fire({
+                title: 'Hapus Data?', text: `Yakin ingin menghapus SPMB Tahun ${tahun}?`, icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus'
+            }).then(async (result) => {
+                if (!result.isConfirmed) return;
+                try {
+                    const response = await apiRequest('deleteSPMB', { token: activeAdmin.token, id });
+                    masterSPMB = response.masterSPMB || masterSPMB.filter(m => m.id !== id);
+                    populatePublicSPMBDropdown();
+                    renderTableMasterSPMB();
+                    Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+                } catch (err) {
+                    Swal.fire('Gagal', err.message, 'error');
+                }
+            });
+        }
 
         // ==========================================
-        // 10. MASTER AKUN (CRUD)
+        // MASTER AKUN (CRUD)
         // ==========================================
         function renderTableMasterAkun() {
             const tbody = getEl('tableBodyAkun');
@@ -2465,116 +2110,77 @@ function deleteMasterSPMB(id, tahun) {
             openModal('akunModal');
         }
 
+        async function saveMasterAkun(e) {
+            e.preventDefault();
+            const id = getEl('akunId').value;
+            const uName = getEl('setAkunUsername').value.trim();
+            const pwd = getEl('setAkunPassword').value;
 
-async function saveMasterAkun(e) {
-    e.preventDefault();
-
-    const id = getEl('akunId').value;
-    const uName = getEl('setAkunUsername').value.trim();
-    const pwd = getEl('setAkunPassword').value;
-
-    try {
-        const result = await apiRequest('saveAkun', {
-            token: activeAdmin.token,
-            data: {
-                id: id || '',
-                nama: getEl('setAkunNama').value.trim(),
-                username: uName,
-                password: pwd,
-                role: getEl('setAkunRole').value,
-                status: getEl('setAkunStatus').value
+            try {
+                const result = await apiRequest('saveAkun', {
+                    token: activeAdmin.token,
+                    data: {
+                        id: id || '',
+                        nama: getEl('setAkunNama').value.trim(),
+                        username: uName,
+                        password: pwd,
+                        role: getEl('setAkunRole').value,
+                        status: getEl('setAkunStatus').value
+                    }
+                });
+                masterAkun = result.masterAkun || masterAkun;
+                closeModal('akunModal');
+                renderTableMasterAkun();
+                Swal.fire({icon:'success', title:id ? 'Akun Diperbarui' : 'Akun Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+            } catch (err) {
+                Swal.fire('Gagal', err.message, 'error');
             }
-        });
-
-        masterAkun = result.masterAkun || masterAkun;
-        closeModal('akunModal');
-        renderTableMasterAkun();
-        Swal.fire({icon:'success', title:id ? 'Akun Diperbarui' : 'Akun Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-    } catch (err) {
-        Swal.fire('Gagal', err.message, 'error');
-    }
-}
-
-
-function deleteAkun(id, username) {
-    if (activeAdmin && activeAdmin.id === id) {
-        Swal.fire('Akses Ditolak', 'Anda tidak dapat menghapus akun yang sedang digunakan.', 'error');
-        return;
-    }
-
-    Swal.fire({
-        title: 'Hapus Akun?',
-        text: `Yakin ingin menghapus pengguna '${username}'?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#9ca3af',
-        confirmButtonText: 'Ya, Hapus'
-    }).then(async (result) => {
-        if (!result.isConfirmed) return;
-        try {
-            const response = await apiRequest('deleteAkun', { token: activeAdmin.token, id });
-            masterAkun = response.masterAkun || masterAkun.filter(m => m.id !== id);
-            renderTableMasterAkun();
-            Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-        } catch (err) {
-            Swal.fire('Gagal', err.message, 'error');
         }
-    });
-}
+
+        function deleteAkun(id, username) {
+            if (activeAdmin && activeAdmin.id === id) {
+                Swal.fire('Akses Ditolak', 'Anda tidak dapat menghapus akun yang sedang digunakan.', 'error');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Hapus Akun?', text: `Yakin ingin menghapus pengguna '${username}'?`, icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus'
+            }).then(async (result) => {
+                if (!result.isConfirmed) return;
+                try {
+                    const response = await apiRequest('deleteAkun', { token: activeAdmin.token, id });
+                    masterAkun = response.masterAkun || masterAkun.filter(m => m.id !== id);
+                    renderTableMasterAkun();
+                    Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+                } catch (err) {
+                    Swal.fire('Gagal', err.message, 'error');
+                }
+            });
+        }
 
         // ==========================================
-        // 11. SYSTEM CONFIG & RESET
+        // SYSTEM CONFIG
         // ==========================================
+        async function updateActiveAcademicYear(e) {
+            e.preventDefault();
+            const val = getEl('sysConfigTahunAktif').value;
 
-async function updateActiveAcademicYear(e) {
-    e.preventDefault();
-    const val = getEl('sysConfigTahunAktif').value;
+            try {
+                const result = await apiRequest('updateConfig', { token: activeAdmin.token, data: { tahunPelajaranBukuTamu: val } });
+                SYSTEM_CONFIG = result.systemConfig || {...SYSTEM_CONFIG, tahunPelajaranBukuTamu: val};
+                
+                getEl('headerTahunBukuTamu').innerText = val;
+                getEl('headerAdminTahunBukuTamu').innerText = val;
+                Swal.fire({icon:'success', title:'Tersimpan', text:`Periode Buku Tamu aktif diubah menjadi ${val}.`, confirmButtonColor:'#2A5245'});
 
-    try {
-        const result = await apiRequest('updateConfig', {
-            token: activeAdmin.token,
-            data: { tahunPelajaranBukuTamu: val }
-        });
-
-        SYSTEM_CONFIG = result.systemConfig || {...SYSTEM_CONFIG, tahunPelajaranBukuTamu: val};
-        getEl('headerTahunBukuTamu').innerText = val;
-        getEl('headerAdminTahunBukuTamu').innerText = val;
-
-        Swal.fire({icon:'success', title:'Tersimpan', text:`Periode Buku Tamu aktif diubah menjadi ${val}.`, confirmButtonColor:'#2A5245'});
-
-        if(!getEl('content-rekap').classList.contains('hidden-section')) filterData();
-        if(!getEl('content-dataSPMB').classList.contains('hidden-section')) filterDataSPMB();
-        if(!getEl('content-dashboard').classList.contains('hidden-section')) loadDashboard();
-    } catch (err) {
-        Swal.fire('Gagal', err.message, 'error');
-    }
-}
-
-
-function resetDemoData() {
-    Swal.fire({
-        title: 'Reset Database?',
-        html: '<p class="text-sm">Fungsi ini akan menghapus data Buku Tamu dan mengembalikan Master SPMB, Master Akun, serta Konfigurasi ke data awal.</p>',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#9ca3af',
-        confirmButtonText: 'Ya, Reset Database'
-    }).then(async (result) => {
-        if (!result.isConfirmed) return;
-
-        try {
-            await apiRequest('resetDatabase', { token: activeAdmin.token });
-            await loadAdminData();
-            populatePublicSPMBDropdown();
-            switchAdminMenu('dashboard');
-            Swal.fire({title:'Berhasil', text:'Database telah dikembalikan ke kondisi awal.', icon:'success', confirmButtonColor:'#2A5245'});
-        } catch (err) {
-            Swal.fire('Gagal', err.message, 'error');
+                if(!getEl('content-rekap').classList.contains('hidden-section')) filterData();
+                if(!getEl('content-dataSPMB').classList.contains('hidden-section')) filterDataSPMB();
+                if(!getEl('content-dashboard').classList.contains('hidden-section')) loadDashboard();
+            } catch (err) {
+                Swal.fire('Gagal', err.message, 'error');
+            }
         }
-    });
-}
 
         window.addEventListener('load', () => initApp());
     </script>
