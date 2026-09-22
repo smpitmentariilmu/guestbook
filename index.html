@@ -1114,34 +1114,56 @@
 
         // API Request Handler (Diperbaiki Error Handlingnya)
         async function apiRequest(action, data = {}) {
-            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'MASUKKAN_URL_WEB_APP_DI_SINI') {
-                throw new Error('APPS_SCRIPT_URL belum dikonfigurasi pada file HTML.');
-            }
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'MASUKKAN_URL_WEB_APP_DI_SINI') {
+        throw new Error('APPS_SCRIPT_URL belum dikonfigurasi pada file HTML.');
+    }
 
-            try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action, ...data })
-                });
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify({
+                action,
+                ...data
+            })
+        });
 
-                const text = await response.text();
-                let result;
-                try {
-                    result = JSON.parse(text);
-                } catch (e) {
-                    console.error('Response server bukan JSON:', text);
-                    throw new Error('Server Apps Script gagal merespons dengan JSON (biasanya karena belum di-deploy dengan benar atau URL salah).');
-                }
+        const text = await response.text();
 
-                if (result.status !== 'success') {
-                    throw new Error(result.message || 'Terjadi kesalahan pada server.');
-                }
-                return result;
-            } catch (err) {
-                throw err;
-            }
+        console.log('HTTP Status:', response.status);
+        console.log('Response Apps Script:', text);
+
+        if (!text || !text.trim()) {
+            throw new Error('Server tidak mengembalikan respons.');
         }
+
+        let result;
+
+        try {
+            result = JSON.parse(text);
+        } catch (parseError) {
+            console.error('Response bukan JSON:', text);
+
+            throw new Error(
+                'Data kemungkinan sudah tersimpan, tetapi respons server tidak dapat dibaca oleh sistem.'
+            );
+        }
+
+        if (!result || result.status !== 'success') {
+            throw new Error(
+                result?.message || 'Terjadi kesalahan pada server.'
+            );
+        }
+
+        return result;
+
+    } catch (err) {
+        console.error('API Request Error:', err);
+        throw err;
+    }
+}
 
         const LS_KEYS = { ADMIN_SESSION: 'smpit_admin_session_v3' };
 
