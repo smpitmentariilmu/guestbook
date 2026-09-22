@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Buku Tamu Digital - SMPIT Mentari Ilmu Karawang</title>
 
-
      <!-- Favicon & App Icon -->
     <link rel="icon" type="image/png" href="https://mentariilmu.org/logo.png">
     <link rel="apple-touch-icon" href="https://mentariilmu.org/logo.png">
@@ -474,7 +473,7 @@
                                 <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-sliders"></i></div>
                                 <p class="font-bold text-gray-700 text-sm">Master SPMB</p>
                             </div>
-                            <div onclick="switchAdminMenu('masterAkun')" id="qa-masterAkun" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
+                            <div id="qa-masterAkun" onclick="switchAdminMenu('masterAkun')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
                                 <div class="w-10 h-10 rounded-xl bg-pastelPurple text-purple-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-users-gear"></i></div>
                                 <p class="font-bold text-gray-700 text-sm">Master Akun</p>
                             </div>
@@ -1087,7 +1086,7 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Hak Akses <span class="text-red-500">*</span></label>
                             <select id="setAkunRole" class="modern-input cursor-pointer font-bold">
-                               <option value="Admin">Admin</option>
+                                <option value="Admin">Admin Utama</option>
                                 <option value="Manajemen">Manajemen</option>
                                 <option value="Gtk">Gtk</option>
                             </select>
@@ -1111,60 +1110,53 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykQuoEAfOl7h0zVPzXe8Ko5wblSeM3dKW-zyfiRqgKXXtN7zagsbxU4P0zyJcUCmWFQA/exec'; // PASTI GANTI DENGAN URL WEB APP ANDA
+        // PASTI GANTI DENGAN URL WEB APP ANDA SENDIRI
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykQuoEAfOl7h0zVPzXe8Ko5wblSeM3dKW-zyfiRqgKXXtN7zagsbxU4P0zyJcUCmWFQA/exec'; 
 
-        // API Request Handler (Diperbaiki Error Handlingnya)
+        // API Request Handler
         async function apiRequest(action, data = {}) {
-    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'MASUKKAN_URL_WEB_APP_DI_SINI') {
-        throw new Error('APPS_SCRIPT_URL belum dikonfigurasi pada file HTML.');
-    }
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'MASUKKAN_URL_WEB_APP_DI_SINI') {
+                throw new Error('APPS_SCRIPT_URL belum dikonfigurasi pada file HTML.');
+            }
 
-    try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8'
-            },
-            body: JSON.stringify({
-                action,
-                ...data
-            })
-        });
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8'
+                    },
+                    body: JSON.stringify({
+                        action,
+                        ...data
+                    })
+                });
 
-        const text = await response.text();
+                const text = await response.text();
 
-        console.log('HTTP Status:', response.status);
-        console.log('Response Apps Script:', text);
+                if (!text || !text.trim()) {
+                    throw new Error('Server tidak mengembalikan respons.');
+                }
 
-        if (!text || !text.trim()) {
-            throw new Error('Server tidak mengembalikan respons.');
+                let result;
+
+                try {
+                    result = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Response bukan JSON:', text);
+                    throw new Error('Data kemungkinan sudah tersimpan, tetapi respons server tidak dapat dibaca oleh sistem.');
+                }
+
+                if (!result || result.status !== 'success') {
+                    throw new Error(result?.message || 'Terjadi kesalahan pada server.');
+                }
+
+                return result;
+
+            } catch (err) {
+                console.error('API Request Error:', err);
+                throw err;
+            }
         }
-
-        let result;
-
-        try {
-            result = JSON.parse(text);
-        } catch (parseError) {
-            console.error('Response bukan JSON:', text);
-
-            throw new Error(
-                'Data kemungkinan sudah tersimpan, tetapi respons server tidak dapat dibaca oleh sistem.'
-            );
-        }
-
-        if (!result || result.status !== 'success') {
-            throw new Error(
-                result?.message || 'Terjadi kesalahan pada server.'
-            );
-        }
-
-        return result;
-
-    } catch (err) {
-        console.error('API Request Error:', err);
-        throw err;
-    }
-}
 
         const LS_KEYS = { ADMIN_SESSION: 'smpit_admin_session_v3' };
 
@@ -1494,8 +1486,7 @@
             const canAccessMasterSPMB = (role === 'Admin' || role === 'Manajemen');
             if (menuSettingsSPMB) menuSettingsSPMB.style.display = canAccessMasterSPMB ? 'flex' : 'none';
             if (qaSettingsSPMB) qaSettingsSPMB.style.display = canAccessMasterSPMB ? 'flex' : 'none';
-            if (mobNavSettingsSPMB) mobNavSettingsSPMB.style.display = canAccessMasterSPMB ? 'flex' : 'none';
-
+            
             // 2. Hak Akses Master Akun & Sistem Global (Hanya Admin)
             const canAccessSystem = (role === 'Admin');
             if (menuMasterAkun) menuMasterAkun.style.display = canAccessSystem ? 'flex' : 'none';
@@ -1504,12 +1495,22 @@
 
             // 3. Dynamic Mobile Nav Layout
             if (role === 'Admin') {
+                if (mobNavSettingsSPMB) {
+                    mobNavSettingsSPMB.style.display = 'flex';
+                    mobNavSettingsSPMB.innerHTML = `<i class="fa-solid fa-graduation-cap text-xl mb-1"></i><span class="text-[9px] font-bold">Master</span>`;
+                    mobNavSettingsSPMB.setAttribute('onclick', "switchAdminMenu('settingsSPMB')");
+                }
                 if (mobNavMasterAkun) {
                     mobNavMasterAkun.style.display = 'flex';
                     mobNavMasterAkun.innerHTML = `<i class="fa-solid fa-users-gear text-xl mb-1"></i><span class="text-[9px] font-bold text-center leading-none">Akun</span>`;
                     mobNavMasterAkun.setAttribute('onclick', "switchAdminMenu('masterAkun')");
                 }
             } else if (role === 'Manajemen') {
+                if (mobNavSettingsSPMB) {
+                    mobNavSettingsSPMB.style.display = 'flex';
+                    mobNavSettingsSPMB.innerHTML = `<i class="fa-solid fa-graduation-cap text-xl mb-1"></i><span class="text-[9px] font-bold">Master</span>`;
+                    mobNavSettingsSPMB.setAttribute('onclick', "switchAdminMenu('settingsSPMB')");
+                }
                 if (mobNavMasterAkun) {
                     mobNavMasterAkun.style.display = 'flex';
                     mobNavMasterAkun.innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
@@ -1530,6 +1531,17 @@
         }
 
         function switchAdminMenu(menuId) {
+            // Proteksi Client-Side: Tolak perpindahan jika tidak berhak
+            const role = activeAdmin?.role || '';
+            if ((menuId === 'masterAkun' || menuId === 'settingsSystem') && role !== 'Admin') {
+                Swal.fire('Akses Ditolak', 'Anda tidak memiliki hak akses ke menu ini.', 'error');
+                return;
+            }
+            if (menuId === 'settingsSPMB' && role !== 'Admin' && role !== 'Manajemen') {
+                Swal.fire('Akses Ditolak', 'Anda tidak memiliki hak akses ke menu ini.', 'error');
+                return;
+            }
+
             document.querySelectorAll('.admin-content').forEach(el => el.classList.add('hidden-section'));
             
             document.querySelectorAll('.admin-menu-btn').forEach(el => {
@@ -1542,15 +1554,6 @@
                 el.classList.add('text-gray-400');
             });
 
-            // Proteksi Client-Side: Tolak perpindahan jika tidak berhak
-            const role = activeAdmin?.role || '';
-            if ((menuId === 'masterAkun' || menuId === 'settingsSystem') && role !== 'Admin') {
-                return Swal.fire('Akses Ditolak', 'Anda tidak memiliki hak akses ke menu ini.', 'error');
-            }
-            if (menuId === 'settingsSPMB' && role !== 'Admin' && role !== 'Manajemen') {
-                return Swal.fire('Akses Ditolak', 'Anda tidak memiliki hak akses ke menu ini.', 'error');
-            }
-
             const contentEl = getEl(`content-${menuId}`);
             if (contentEl) contentEl.classList.remove('hidden-section');
             
@@ -1560,8 +1563,12 @@
                 btn.classList.remove('text-gray-500', 'font-medium', 'hover:bg-pastelGreen', 'hover:text-primary');
             }
 
+            // Highlighting Mobile Nav Icons accurately based on Role
             let mobBtnId = menuId;
-            if(menuId === 'profile' && activeAdmin?.role === 'Manajemen') mobBtnId = 'masterAkun'; 
+            if (menuId === 'profile') {
+                if (role === 'Manajemen') mobBtnId = 'masterAkun'; 
+                if (role === 'Gtk') mobBtnId = 'settingsSPMB';
+            }
             const mobBtn = getEl(`mobnav-${mobBtnId}`);
             if(mobBtn) {
                 mobBtn.classList.add('text-primary', 'font-bold', 'bg-pastelGreen/30', 'rounded-xl');
@@ -2194,7 +2201,7 @@
                 if (m.role === 'Admin') roleBadge = 'text-purple-600 bg-pastelPurple border-purple-200';
                 else if (m.role === 'Manajemen') roleBadge = 'text-blue-600 bg-pastelBlue border-blue-200';
                 else if (m.role === 'Gtk') roleBadge = 'text-green-600 bg-pastelGreen border-green-200';
-
+                
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50/80 transition-colors';
                 tr.innerHTML = `
