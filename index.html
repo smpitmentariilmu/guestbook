@@ -1175,6 +1175,30 @@
     <!-- JAVASCRIPT LOGIC                           -->
     <!-- ========================================== -->
     <script>
+
+        // ============================================================
+        // GOOGLE APPS SCRIPT API
+        // ============================================================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbykQuoEAfOl7h0zVPzXe8Ko5wblSeM3dKW-zyfiRqgKXXtN7zagsbxU4P0zyJcUCmWFQA/exec';
+
+        async function apiRequest(action, data = {}) {
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'MASUKKAN_URL_WEB_APP_DI_SINI') {
+                throw new Error('APPS_SCRIPT_URL belum dikonfigurasi.');
+            }
+
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, ...data })
+            });
+
+            const result = await response.json();
+            if (result.status !== 'success') {
+                throw new Error(result.message || 'Terjadi kesalahan pada server.');
+            }
+            return result;
+        }
+
         // ==========================================
         // 1. DATA CONSTANTS & DEFAULTS
         // ==========================================
@@ -1267,20 +1291,75 @@
         // ==========================================
         // 3. SYSTEM INIT & DATA LOADERS
         // ==========================================
-        function initApp() {
-            loadSystemConfig();
-            loadMasterSPMB();
-            loadMasterAkun();
-            loadBukuTamuData();
-            
-            // Setup UI
-            getEl('headerTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
-            getEl('headerAdminTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu;
-            populatePublicSPMBDropdown();
-            startLiveClock();
-            
-            checkAdminSession();
+
+async function initApp() {
+    try {
+        const result = await apiRequest('getInitData');
+
+        SYSTEM_CONFIG = result.systemConfig || {...defaultSystemConfig};
+        masterSPMB = result.masterSPMB || [];
+
+        getEl('headerTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
+        getEl('headerAdminTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
+
+        if (getEl('sysConfigTahunAktif')) {
+            getEl('sysConfigTahunAktif').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
         }
+
+        populatePublicSPMBDropdown();
+        startLiveClock();
+        checkAdminSession();
+    } catch (err) {
+        console.error(err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Koneksi Database Gagal',
+            text: err.message || 'Tidak dapat terhubung ke Google Apps Script.',
+            confirmButtonColor: '#2A5245'
+        });
+    }
+}
+
+async function loadAdminData() {
+    if (!activeAdmin?.token) return;
+
+    const result = await apiRequest('getAdminData', { token: activeAdmin.token });
+
+    SYSTEM_CONFIG = result.systemConfig || {};
+    masterSPMB = result.masterSPMB || [];
+    masterAkun = result.masterAkun || [];
+    bukuTamu = result.bukuTamu || [];
+
+    if (getEl('sysConfigTahunAktif')) {
+        getEl('sysConfigTahunAktif').value = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
+    }
+
+    getEl('headerTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
+    getEl('headerAdminTahunBukuTamu').innerText = SYSTEM_CONFIG.tahunPelajaranBukuTamu || '';
+    populatePublicSPMBDropdown();
+}
+
+async function loadSystemConfig() {
+    const result = await apiRequest('getInitData');
+    SYSTEM_CONFIG = result.systemConfig || {...defaultSystemConfig};
+}
+
+async function loadMasterSPMB() {
+    const result = await apiRequest('getInitData');
+    masterSPMB = result.masterSPMB || [];
+}
+
+async function loadMasterAkun() {
+    if (!activeAdmin?.token) return;
+    const result = await apiRequest('getAdminData', { token: activeAdmin.token });
+    masterAkun = result.masterAkun || [];
+}
+
+async function loadBukuTamuData() {
+    if (!activeAdmin?.token) return;
+    const result = await apiRequest('getAdminData', { token: activeAdmin.token });
+    bukuTamu = result.bukuTamu || [];
+}
 
         function loadSystemConfig() {
             const saved = localStorage.getItem(LS_KEYS.SYSTEM_CONFIG);
@@ -1392,61 +1471,80 @@
             });
         }
 
-        async function submitBukuTamu(e) {
-            e.preventDefault();
-            if(!getEl('guestType').value) {
-                Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap', text: 'Silakan pilih Tujuan Kunjungan terlebih dahulu.', confirmButtonColor: '#2A5245' });
-                return;
-            }
 
-            const btn = getEl('btnSubmitForm');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<div class="loader"></div>';
-            btn.disabled = true;
+async function submitBukuTamu(e) {
+    e.preventDefault();
 
-            await new Promise(r => setTimeout(r, 800)); // Simulating network
+    if (!getEl('guestType').value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Data Belum Lengkap',
+            text: 'Silakan pilih Tujuan Kunjungan terlebih dahulu.',
+            confirmButtonColor: '#2A5245'
+        });
+        return;
+    }
 
-            const type = getEl('guestType').value;
-            const now = new Date();
-            const payload = {
-                id: generateId('BT'),
-                timestamp: formatTgl(now.toISOString()),
-                _rawDate: now.toISOString(),
-                tahunPelajaranBukuTamu: SYSTEM_CONFIG.tahunPelajaranBukuTamu,
-                nama: getEl('guestName').value.trim(),
-                whatsapp: getEl('guestWA').value.trim(),
-                jenisTamu: type,
-                instansi: "", keperluan: "", namaCalonSiswa: "", tempatLahir: "", tanggalLahir: "", asalSekolah: "", alamat: "", tahunPelajaranSPMB: "", jenisKelamin: ""
-            };
+    const btn = getEl('btnSubmitForm');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<div class="loader"></div>';
+    btn.disabled = true;
 
-            if(type === 'Umum') {
-                payload.instansi = getEl('guestInstansi').value.trim();
-                payload.keperluan = getEl('guestKeperluan').value.trim();
-            } else {
-                payload.tahunPelajaranSPMB = getEl('spmbTahun').value;
-                payload.namaCalonSiswa = getEl('spmbNamaSiswa').value.trim();
-                payload.jenisKelamin = getEl('spmbJenisKelamin').value;
-                payload.tempatLahir = getEl('spmbTempatLahir').value.trim();
-                payload.tanggalLahir = getEl('spmbTanggalLahir').value;
-                payload.asalSekolah = getEl('spmbAsalSekolah').value.trim();
-                payload.alamat = getEl('spmbAlamat').value.trim();
-            }
+    try {
+        const type = getEl('guestType').value;
+        const payload = {
+            tahunPelajaranBukuTamu: SYSTEM_CONFIG.tahunPelajaranBukuTamu,
+            nama: getEl('guestName').value.trim(),
+            whatsapp: getEl('guestWA').value.trim(),
+            jenisTamu: type,
+            instansi: '',
+            keperluan: '',
+            namaCalonSiswa: '',
+            tempatLahir: '',
+            tanggalLahir: '',
+            asalSekolah: '',
+            alamat: '',
+            tahunPelajaranSPMB: '',
+            jenisKelamin: ''
+        };
 
-            bukuTamu.unshift(payload); 
-            localStorage.setItem(LS_KEYS.BUKU_TAMU, JSON.stringify(bukuTamu));
-            
-            getEl('guestForm').reset();
-            getEl('guestType').value = '';
-            getEl('cardUmum').classList.remove('selected');
-            getEl('cardSPMB').classList.remove('selected');
-            getEl('formUmum').classList.add('hidden-section');
-            getEl('formSPMB').classList.add('hidden-section');
-            
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-
-            showSuccessModal(payload);
+        if (type === 'Umum') {
+            payload.instansi = getEl('guestInstansi').value.trim();
+            payload.keperluan = getEl('guestKeperluan').value.trim();
+        } else {
+            payload.tahunPelajaranSPMB = getEl('spmbTahun').value;
+            payload.namaCalonSiswa = getEl('spmbNamaSiswa').value.trim();
+            payload.jenisKelamin = getEl('spmbJenisKelamin').value;
+            payload.tempatLahir = getEl('spmbTempatLahir').value.trim();
+            payload.tanggalLahir = getEl('spmbTanggalLahir').value;
+            payload.asalSekolah = getEl('spmbAsalSekolah').value.trim();
+            payload.alamat = getEl('spmbAlamat').value.trim();
         }
+
+        const result = await apiRequest('saveGuest', { data: payload });
+        const saved = result.data || payload;
+        bukuTamu.unshift(saved);
+
+        getEl('guestForm').reset();
+        getEl('guestType').value = '';
+        getEl('cardUmum').classList.remove('selected');
+        getEl('cardSPMB').classList.remove('selected');
+        getEl('formUmum').classList.add('hidden-section');
+        getEl('formSPMB').classList.add('hidden-section');
+
+        showSuccessModal(saved);
+    } catch (err) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal Menyimpan',
+            text: err.message || 'Data kunjungan gagal disimpan.',
+            confirmButtonColor: '#2A5245'
+        });
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
 
         function showSuccessModal(data) {
             let config = {};
@@ -1498,26 +1596,119 @@
             getEl('mobileSidebarOverlay').classList.toggle('hidden');
         }
 
-        function loginAdmin(e) {
-            e.preventDefault();
-            const u = getEl('loginUsername').value;
-            const p = getEl('loginPassword').value;
-            
-            const user = masterAkun.find(a => a.username === u && a.password === p);
-            if(user) {
-                if(user.status !== 'Aktif') {
-                    Swal.fire({ icon: 'error', title: 'Akun Tidak Aktif', text: 'Silakan hubungi administrator utama.', confirmButtonColor: '#2A5245' });
-                    return;
-                }
-                const sessionData = { id: user.id, nama: user.nama, username: user.username, role: user.role };
-                localStorage.setItem(LS_KEYS.ADMIN_SESSION, JSON.stringify(sessionData));
-                getEl('loginForm').reset();
-                closeModal('loginModal');
-                checkAdminSession();
-            } else {
-                Swal.fire({ icon: 'error', title: 'Login Gagal', text: 'Username atau password tidak sesuai.', confirmButtonColor: '#2A5245' });
-            }
+
+async function loginAdmin(e) {
+    e.preventDefault();
+
+    const u = getEl('loginUsername').value.trim();
+    const p = getEl('loginPassword').value;
+
+    if (!u || !p) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Data Belum Lengkap',
+            text: 'Username dan password wajib diisi.',
+            confirmButtonColor: '#2A5245'
+        });
+        return;
+    }
+
+    const btn = e.submitter || getEl('loginForm').querySelector('button[type="submit"]');
+    const originalText = btn ? btn.innerHTML : '';
+
+    try {
+        if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+            btn.disabled = true;
         }
+
+        const result = await apiRequest('login', { username: u, password: p });
+        activeAdmin = result.user;
+        localStorage.setItem(LS_KEYS.ADMIN_SESSION, JSON.stringify(activeAdmin));
+
+        getEl('loginForm').reset();
+        closeModal('loginModal');
+
+        await loadAdminData();
+        applyAdminSessionUI();
+    } catch (err) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Gagal',
+            text: err.message || 'Username atau password tidak sesuai.',
+            confirmButtonColor: '#2A5245'
+        });
+    } finally {
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+}
+
+function logoutAdmin() {
+    localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
+    activeAdmin = null;
+    checkAdminSession();
+}
+
+async function checkAdminSession() {
+    const sessionData = localStorage.getItem(LS_KEYS.ADMIN_SESSION);
+
+    if (!sessionData) {
+        activeAdmin = null;
+        getEl('admin-view').classList.add('hidden-section');
+        getEl('public-view').classList.remove('hidden-section');
+        getEl('sidebar').classList.remove('sidebar-collapsed');
+        return;
+    }
+
+    try {
+        activeAdmin = JSON.parse(sessionData);
+        if (!activeAdmin?.token) throw new Error('Sesi tidak valid.');
+
+        await loadAdminData();
+        applyAdminSessionUI();
+    } catch (err) {
+        localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
+        activeAdmin = null;
+        getEl('admin-view').classList.add('hidden-section');
+        getEl('public-view').classList.remove('hidden-section');
+        Swal.fire({
+            icon: 'info',
+            title: 'Sesi Berakhir',
+            text: 'Silakan login kembali.',
+            confirmButtonColor: '#2A5245'
+        });
+    }
+}
+
+function applyAdminSessionUI() {
+    getEl('adminHeaderName').innerText = activeAdmin.nama.split(' ')[0];
+    getEl('adminHeaderRole').innerText = activeAdmin.role;
+    getEl('dashHeroName').innerText = activeAdmin.nama.split(' ')[0];
+    getEl('profileName').innerText = activeAdmin.nama;
+    getEl('profileRole').innerText = activeAdmin.role;
+    getEl('profileUsername').innerText = activeAdmin.username;
+    getEl('profileInitials').innerText = activeAdmin.nama.substring(0, 2).toUpperCase();
+
+    const isManajemen = activeAdmin.role === 'Manajemen';
+    getEl('menu-masterAkun').style.display = isManajemen ? 'none' : 'flex';
+    getEl('qa-masterAkun').style.display = isManajemen ? 'none' : 'flex';
+    getEl('btnResetDemo').style.display = isManajemen ? 'none' : 'flex';
+
+    if (isManajemen) {
+        getEl('mobnav-masterAkun').innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
+        getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('profile')");
+    } else {
+        getEl('mobnav-masterAkun').innerHTML = `<i class="fa-solid fa-users-gear text-xl mb-1"></i><span class="text-[9px] font-bold text-center leading-none">Akun</span>`;
+        getEl('mobnav-masterAkun').setAttribute('onclick', "switchAdminMenu('masterAkun')");
+    }
+
+    getEl('public-view').classList.add('hidden-section');
+    getEl('admin-view').classList.remove('hidden-section');
+    switchAdminMenu('dashboard');
+}
 
         function logoutAdmin() {
             localStorage.removeItem(LS_KEYS.ADMIN_SESSION);
@@ -2174,39 +2365,55 @@
             openModal('spmbModal');
         }
 
-        function saveMasterSPMB(e) {
-            e.preventDefault();
-            const id = getEl('spmbId').value;
-            const newData = {
-                tahun: getEl('setSpmbTahun').value.trim(), linkWhatsApp: getEl('setSpmbLink').value.trim(),
-                nomorAdmin: getEl('setSpmbAdmin').value.trim(), pesanSPMB: getEl('setSpmbPesan').value.trim(), status: getEl('setSpmbStatus').value
-            };
 
-            if(id) {
-                const idx = masterSPMB.findIndex(m => m.id === id);
-                if(idx > -1) masterSPMB[idx] = { ...masterSPMB[idx], ...newData };
-                Swal.fire({icon:'success', title:'Tersimpan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-            } else {
-                newData.id = generateId('SPMB'); masterSPMB.push(newData);
-                Swal.fire({icon:'success', title:'Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-            }
-            localStorage.setItem(LS_KEYS.MASTER_SPMB, JSON.stringify(masterSPMB));
-            closeModal('spmbModal'); renderTableMasterSPMB();
-        }
+async function saveMasterSPMB(e) {
+    e.preventDefault();
 
-        function deleteMasterSPMB(id, tahun) {
-            Swal.fire({
-                title: 'Hapus Data?', text: `Yakin ingin menghapus SPMB Tahun ${tahun}?`, icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    masterSPMB = masterSPMB.filter(m => m.id !== id);
-                    localStorage.setItem(LS_KEYS.MASTER_SPMB, JSON.stringify(masterSPMB));
-                    renderTableMasterSPMB();
-                    Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-                }
-            });
+    const id = getEl('spmbId').value;
+    const data = {
+        id: id || '',
+        tahun: getEl('setSpmbTahun').value.trim(),
+        linkWhatsApp: getEl('setSpmbLink').value.trim(),
+        nomorAdmin: getEl('setSpmbAdmin').value.trim(),
+        pesanSPMB: getEl('setSpmbPesan').value.trim(),
+        status: getEl('setSpmbStatus').value
+    };
+
+    try {
+        const result = await apiRequest('saveSPMB', { token: activeAdmin.token, data });
+        masterSPMB = result.masterSPMB || masterSPMB;
+        populatePublicSPMBDropdown();
+        closeModal('spmbModal');
+        renderTableMasterSPMB();
+        Swal.fire({ icon:'success', title:id ? 'Diperbarui' : 'Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500 });
+    } catch (err) {
+        Swal.fire('Gagal', err.message, 'error');
+    }
+}
+
+
+function deleteMasterSPMB(id, tahun) {
+    Swal.fire({
+        title: 'Hapus Data?',
+        text: `Yakin ingin menghapus SPMB Tahun ${tahun}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#9ca3af',
+        confirmButtonText: 'Ya, Hapus'
+    }).then(async (result) => {
+        if (!result.isConfirmed) return;
+        try {
+            const response = await apiRequest('deleteSPMB', { token: activeAdmin.token, id });
+            masterSPMB = response.masterSPMB || masterSPMB.filter(m => m.id !== id);
+            populatePublicSPMBDropdown();
+            renderTableMasterSPMB();
+            Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+        } catch (err) {
+            Swal.fire('Gagal', err.message, 'error');
         }
+    });
+}
 
         // ==========================================
         // 10. MASTER AKUN (CRUD)
@@ -2265,92 +2472,118 @@
             openModal('akunModal');
         }
 
-        function saveMasterAkun(e) {
-            e.preventDefault();
-            const id = getEl('akunId').value;
-            const uName = getEl('setAkunUsername').value.trim();
-            const pwd = getEl('setAkunPassword').value;
 
-            const isDup = masterAkun.some(a => a.username === uName && a.id !== id);
-            if(isDup) { Swal.fire('Username Terpakai', 'Silakan gunakan username lain.', 'error'); return; }
+async function saveMasterAkun(e) {
+    e.preventDefault();
 
-            if(id) {
-                const idx = masterAkun.findIndex(a => a.id === id);
-                if(idx > -1) {
-                    masterAkun[idx].nama = getEl('setAkunNama').value.trim();
-                    masterAkun[idx].username = uName;
-                    masterAkun[idx].role = getEl('setAkunRole').value;
-                    masterAkun[idx].status = getEl('setAkunStatus').value;
-                    if(pwd) masterAkun[idx].password = pwd; 
-                }
-                Swal.fire({icon:'success', title:'Akun Diperbarui', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-            } else {
-                masterAkun.push({
-                    id: generateId('USR'), nama: getEl('setAkunNama').value.trim(), username: uName, password: pwd,
-                    role: getEl('setAkunRole').value, status: getEl('setAkunStatus').value
-                });
-                Swal.fire({icon:'success', title:'Akun Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+    const id = getEl('akunId').value;
+    const uName = getEl('setAkunUsername').value.trim();
+    const pwd = getEl('setAkunPassword').value;
+
+    try {
+        const result = await apiRequest('saveAkun', {
+            token: activeAdmin.token,
+            data: {
+                id: id || '',
+                nama: getEl('setAkunNama').value.trim(),
+                username: uName,
+                password: pwd,
+                role: getEl('setAkunRole').value,
+                status: getEl('setAkunStatus').value
             }
-            localStorage.setItem(LS_KEYS.MASTER_AKUN, JSON.stringify(masterAkun));
-            closeModal('akunModal'); renderTableMasterAkun();
-        }
+        });
 
-        function deleteAkun(id, username) {
-            if(activeAdmin && activeAdmin.id === id) {
-                Swal.fire('Akses Ditolak', 'Anda tidak dapat menghapus akun yang sedang digunakan.', 'error');
-                return;
-            }
-            Swal.fire({
-                title: 'Hapus Akun?', text: `Yakin ingin menghapus pengguna '${username}'?`, icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Hapus'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    masterAkun = masterAkun.filter(m => m.id !== id);
-                    localStorage.setItem(LS_KEYS.MASTER_AKUN, JSON.stringify(masterAkun));
-                    renderTableMasterAkun();
-                    Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
-                }
-            });
+        masterAkun = result.masterAkun || masterAkun;
+        closeModal('akunModal');
+        renderTableMasterAkun();
+        Swal.fire({icon:'success', title:id ? 'Akun Diperbarui' : 'Akun Ditambahkan', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+    } catch (err) {
+        Swal.fire('Gagal', err.message, 'error');
+    }
+}
+
+
+function deleteAkun(id, username) {
+    if (activeAdmin && activeAdmin.id === id) {
+        Swal.fire('Akses Ditolak', 'Anda tidak dapat menghapus akun yang sedang digunakan.', 'error');
+        return;
+    }
+
+    Swal.fire({
+        title: 'Hapus Akun?',
+        text: `Yakin ingin menghapus pengguna '${username}'?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#9ca3af',
+        confirmButtonText: 'Ya, Hapus'
+    }).then(async (result) => {
+        if (!result.isConfirmed) return;
+        try {
+            const response = await apiRequest('deleteAkun', { token: activeAdmin.token, id });
+            masterAkun = response.masterAkun || masterAkun.filter(m => m.id !== id);
+            renderTableMasterAkun();
+            Swal.fire({icon:'success', title:'Terhapus', toast:true, position:'top-end', showConfirmButton:false, timer:1500});
+        } catch (err) {
+            Swal.fire('Gagal', err.message, 'error');
         }
+    });
+}
 
         // ==========================================
         // 11. SYSTEM CONFIG & RESET
         // ==========================================
-        function updateActiveAcademicYear(e) {
-            e.preventDefault();
-            const val = getEl('sysConfigTahunAktif').value;
-            SYSTEM_CONFIG.tahunPelajaranBukuTamu = val;
-            localStorage.setItem(LS_KEYS.SYSTEM_CONFIG, JSON.stringify(SYSTEM_CONFIG));
-            
-            getEl('headerTahunBukuTamu').innerText = val;
-            getEl('headerAdminTahunBukuTamu').innerText = val;
-            
-            Swal.fire({icon:'success', title:'Tersimpan', text:`Periode Buku Tamu aktif diubah menjadi ${val}.`, confirmButtonColor: '#2A5245'});
-            
-            // Refresh data views to match new active period
-            if(!getEl('content-rekap').classList.contains('hidden-section')) filterData();
-            if(!getEl('content-dataSPMB').classList.contains('hidden-section')) filterDataSPMB();
-            if(!getEl('content-dashboard').classList.contains('hidden-section')) loadDashboard();
-        }
 
-        function resetDemoData() {
-            Swal.fire({
-                title: 'Reset Semua Data?',
-                html: '<p class="text-sm">Buku Tamu, Master SPMB, Master Akun, dan Konfigurasi akan dikembalikan ke kondisi awal (Data Dummy).</p>',
-                icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#9ca3af', confirmButtonText: 'Ya, Reset Total'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Object.values(LS_KEYS).forEach(k => localStorage.removeItem(k));
-                    
-                    initApp(); 
-                    if(activeAdmin) switchAdminMenu('dashboard');
-                    Swal.fire({title: 'Berhasil', text: 'Sistem telah dikembalikan ke kondisi Demo awal.', icon: 'success', confirmButtonColor: '#2A5245'});
-                }
-            });
-        }
+async function updateActiveAcademicYear(e) {
+    e.preventDefault();
+    const val = getEl('sysConfigTahunAktif').value;
 
-        // Initialize Application
-        window.onload = initApp;
+    try {
+        const result = await apiRequest('updateConfig', {
+            token: activeAdmin.token,
+            data: { tahunPelajaranBukuTamu: val }
+        });
+
+        SYSTEM_CONFIG = result.systemConfig || {...SYSTEM_CONFIG, tahunPelajaranBukuTamu: val};
+        getEl('headerTahunBukuTamu').innerText = val;
+        getEl('headerAdminTahunBukuTamu').innerText = val;
+
+        Swal.fire({icon:'success', title:'Tersimpan', text:`Periode Buku Tamu aktif diubah menjadi ${val}.`, confirmButtonColor:'#2A5245'});
+
+        if(!getEl('content-rekap').classList.contains('hidden-section')) filterData();
+        if(!getEl('content-dataSPMB').classList.contains('hidden-section')) filterDataSPMB();
+        if(!getEl('content-dashboard').classList.contains('hidden-section')) loadDashboard();
+    } catch (err) {
+        Swal.fire('Gagal', err.message, 'error');
+    }
+}
+
+
+function resetDemoData() {
+    Swal.fire({
+        title: 'Reset Database?',
+        html: '<p class="text-sm">Fungsi ini akan menghapus data Buku Tamu dan mengembalikan Master SPMB, Master Akun, serta Konfigurasi ke data awal.</p>',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#9ca3af',
+        confirmButtonText: 'Ya, Reset Database'
+    }).then(async (result) => {
+        if (!result.isConfirmed) return;
+
+        try {
+            await apiRequest('resetDatabase', { token: activeAdmin.token });
+            await loadAdminData();
+            populatePublicSPMBDropdown();
+            switchAdminMenu('dashboard');
+            Swal.fire({title:'Berhasil', text:'Database telah dikembalikan ke kondisi awal.', icon:'success', confirmButtonColor:'#2A5245'});
+        } catch (err) {
+            Swal.fire('Gagal', err.message, 'error');
+        }
+    });
+}
+
+        window.addEventListener('load', () => initApp());
     </script>
 </body>
 </html>
