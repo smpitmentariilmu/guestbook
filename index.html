@@ -470,7 +470,7 @@
                                 <div class="w-10 h-10 rounded-xl bg-pastelOrange text-orange-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-users-viewfinder"></i></div>
                                 <p class="font-bold text-gray-700 text-sm">Data SPMB</p>
                             </div>
-                            <div onclick="switchAdminMenu('settingsSPMB')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
+                            <div id="qa-settingsSPMB" onclick="switchAdminMenu('settingsSPMB')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all cursor-pointer group flex flex-col justify-between h-28">
                                 <div class="w-10 h-10 rounded-xl bg-pastelGreen text-green-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-sliders"></i></div>
                                 <p class="font-bold text-gray-700 text-sm">Master SPMB</p>
                             </div>
@@ -1087,8 +1087,9 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Hak Akses <span class="text-red-500">*</span></label>
                             <select id="setAkunRole" class="modern-input cursor-pointer font-bold">
+                               <option value="Admin">Admin</option>
                                 <option value="Manajemen">Manajemen</option>
-                                <option value="Admin">Admin Utama</option>
+                                <option value="Gtk">Gtk</option>
                             </select>
                         </div>
                         <div>
@@ -1466,7 +1467,6 @@
         }
 
         function applyAdminSessionUI() {
-            // Gunakan if(getEl) untuk menghindari error Cannot read properties of null
             if (getEl('adminHeaderName')) getEl('adminHeaderName').innerText = activeAdmin.nama.split(' ')[0];
             if (getEl('adminHeaderRole')) getEl('adminHeaderRole').innerText = activeAdmin.role;
             if (getEl('dashHeroName')) getEl('dashHeroName').innerText = activeAdmin.nama.split(' ')[0];
@@ -1475,22 +1475,52 @@
             if (getEl('profileUsername')) getEl('profileUsername').innerText = activeAdmin.username;
             if (getEl('profileInitials')) getEl('profileInitials').innerText = activeAdmin.nama.substring(0, 2).toUpperCase();
 
-            const isManajemen = activeAdmin.role === 'Manajemen';
-            
-            const menuMasterAkun = getEl('menu-masterAkun');
-            if (menuMasterAkun) menuMasterAkun.style.display = isManajemen ? 'none' : 'flex';
-            
-            const qaMasterAkun = getEl('qa-masterAkun');
-            if (qaMasterAkun) qaMasterAkun.style.display = isManajemen ? 'none' : 'flex';
+            const role = activeAdmin.role; // Admin, Manajemen, Gtk
 
+            // Menu Sidebar Elements
+            const menuSettingsSPMB = getEl('menu-settingsSPMB');
+            const menuMasterAkun = getEl('menu-masterAkun');
+            const menuSettingsSystem = getEl('menu-settingsSystem');
+            
+            // Quick Access Elements
+            const qaSettingsSPMB = getEl('qa-settingsSPMB');
+            const qaMasterAkun = getEl('qa-masterAkun');
+
+            // Mobile Nav Elements
+            const mobNavSettingsSPMB = getEl('mobnav-settingsSPMB');
             const mobNavMasterAkun = getEl('mobnav-masterAkun');
-            if (mobNavMasterAkun) {
-                if (isManajemen) {
-                    mobNavMasterAkun.innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
-                    mobNavMasterAkun.setAttribute('onclick', "switchAdminMenu('profile')");
-                } else {
+
+            // 1. Hak Akses Master SPMB (Hanya Admin & Manajemen)
+            const canAccessMasterSPMB = (role === 'Admin' || role === 'Manajemen');
+            if (menuSettingsSPMB) menuSettingsSPMB.style.display = canAccessMasterSPMB ? 'flex' : 'none';
+            if (qaSettingsSPMB) qaSettingsSPMB.style.display = canAccessMasterSPMB ? 'flex' : 'none';
+            if (mobNavSettingsSPMB) mobNavSettingsSPMB.style.display = canAccessMasterSPMB ? 'flex' : 'none';
+
+            // 2. Hak Akses Master Akun & Sistem Global (Hanya Admin)
+            const canAccessSystem = (role === 'Admin');
+            if (menuMasterAkun) menuMasterAkun.style.display = canAccessSystem ? 'flex' : 'none';
+            if (qaMasterAkun) qaMasterAkun.style.display = canAccessSystem ? 'flex' : 'none';
+            if (menuSettingsSystem) menuSettingsSystem.style.display = canAccessSystem ? 'flex' : 'none';
+
+            // 3. Dynamic Mobile Nav Layout
+            if (role === 'Admin') {
+                if (mobNavMasterAkun) {
+                    mobNavMasterAkun.style.display = 'flex';
                     mobNavMasterAkun.innerHTML = `<i class="fa-solid fa-users-gear text-xl mb-1"></i><span class="text-[9px] font-bold text-center leading-none">Akun</span>`;
                     mobNavMasterAkun.setAttribute('onclick', "switchAdminMenu('masterAkun')");
+                }
+            } else if (role === 'Manajemen') {
+                if (mobNavMasterAkun) {
+                    mobNavMasterAkun.style.display = 'flex';
+                    mobNavMasterAkun.innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
+                    mobNavMasterAkun.setAttribute('onclick', "switchAdminMenu('profile')");
+                }
+            } else if (role === 'Gtk') {
+                if (mobNavMasterAkun) mobNavMasterAkun.style.display = 'none'; // Sembunyikan slot 5
+                if (mobNavSettingsSPMB) {
+                    mobNavSettingsSPMB.style.display = 'flex';
+                    mobNavSettingsSPMB.innerHTML = `<i class="fa-regular fa-id-badge text-xl mb-1"></i><span class="text-[9px] font-bold">Profil</span>`;
+                    mobNavSettingsSPMB.setAttribute('onclick', "switchAdminMenu('profile')");
                 }
             }
 
@@ -1511,6 +1541,15 @@
                 el.classList.remove('text-primary', 'font-bold', 'bg-pastelGreen/30', 'rounded-xl');
                 el.classList.add('text-gray-400');
             });
+
+            // Proteksi Client-Side: Tolak perpindahan jika tidak berhak
+            const role = activeAdmin?.role || '';
+            if ((menuId === 'masterAkun' || menuId === 'settingsSystem') && role !== 'Admin') {
+                return Swal.fire('Akses Ditolak', 'Anda tidak memiliki hak akses ke menu ini.', 'error');
+            }
+            if (menuId === 'settingsSPMB' && role !== 'Admin' && role !== 'Manajemen') {
+                return Swal.fire('Akses Ditolak', 'Anda tidak memiliki hak akses ke menu ini.', 'error');
+            }
 
             const contentEl = getEl(`content-${menuId}`);
             if (contentEl) contentEl.classList.remove('hidden-section');
@@ -2151,8 +2190,11 @@
                     ? `<span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-green-200">Aktif</span>`
                     : `<span class="bg-red-100 text-red-700 text-[10px] px-2 py-1 rounded-md font-bold uppercase tracking-wide border border-red-200">Nonaktif</span>`;
                 
-                const roleBadge = m.role === 'Admin' ? 'text-purple-600 bg-pastelPurple border-purple-200' : 'text-blue-600 bg-pastelBlue border-blue-200';
-                
+                let roleBadge = 'text-gray-600 bg-gray-100 border-gray-200';
+                if (m.role === 'Admin') roleBadge = 'text-purple-600 bg-pastelPurple border-purple-200';
+                else if (m.role === 'Manajemen') roleBadge = 'text-blue-600 bg-pastelBlue border-blue-200';
+                else if (m.role === 'Gtk') roleBadge = 'text-green-600 bg-pastelGreen border-green-200';
+
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50/80 transition-colors';
                 tr.innerHTML = `
